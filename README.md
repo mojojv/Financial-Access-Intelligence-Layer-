@@ -29,3 +29,6 @@ financial-access-intelligence/
 ## 📖 Architecture & Documentation
 
 Full architectural specification and ADRs are available in [`docs/architecture/`](docs/architecture/).
+
+
+## Analise o HTML e o índice. Trabalho camilo  work remember Camilo 
