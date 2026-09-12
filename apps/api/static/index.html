@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Access Intelligence Layer (FAIL) — Live Console</title>
+    <title>Financial Access Intelligence Layer (FAIL) — Command Center</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #090d16;
-            --card-bg: rgba(18, 26, 44, 0.75);
+            --bg-dark: #070a12;
+            --card-bg: rgba(15, 23, 42, 0.80);
             --card-border: rgba(255, 255, 255, 0.08);
             --accent-cyan: #00f2fe;
             --accent-blue: #4facfe;
@@ -19,9 +19,8 @@
             --accent-green: #00e676;
             --accent-red: #ff5252;
             --accent-yellow: #ffd700;
-            --text-main: #f1f5f9;
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --glass-glow: 0 8px 32px 0 rgba(0, 242, 254, 0.12);
         }
 
         * {
@@ -36,8 +35,8 @@
             color: var(--text-main);
             min-height: 100vh;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(127, 0, 255, 0.1) 0%, transparent 40%);
+                radial-gradient(circle at 15% 15%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.12) 0%, transparent 45%);
             background-attachment: fixed;
             padding: 24px;
         }
@@ -46,7 +45,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1400px;
+            max-width: 1440px;
             margin: 0 auto 28px auto;
             padding-bottom: 20px;
             border-bottom: 1px solid var(--card-border);
@@ -55,25 +54,25 @@
         .header-title {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
         }
 
         .logo-icon {
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 22px;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+            font-size: 24px;
+            box-shadow: 0 0 24px rgba(0, 242, 254, 0.4);
         }
 
         h1 {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 26px;
+            font-weight: 800;
             letter-spacing: -0.5px;
             background: linear-gradient(90deg, #ffffff, var(--accent-cyan));
             -webkit-background-clip: text;
@@ -83,25 +82,42 @@
         .subtitle {
             font-size: 13px;
             color: var(--text-muted);
-            font-weight: 400;
         }
 
-        .badge-op {
-            background: rgba(0, 242, 254, 0.1);
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            padding: 6px 14px;
-            border-radius: 20px;
+        .model-select-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 8px 16px;
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+        }
+
+        .model-select-wrapper label {
             font-size: 12px;
+            color: var(--text-muted);
             font-weight: 600;
-            letter-spacing: 0.5px;
+        }
+
+        select.model-select {
+            background: var(--bg-dark);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+            cursor: pointer;
         }
 
         .main-grid {
             display: grid;
             grid-template-columns: 380px 1fr;
             gap: 24px;
-            max-width: 1400px;
+            max-width: 1440px;
             margin: 0 auto;
         }
 
@@ -114,38 +130,29 @@
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: 20px;
             padding: 24px;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .card:hover {
-            border-color: rgba(0, 242, 254, 0.3);
         }
 
         .card-title {
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            color: var(--text-main);
         }
 
-        /* Form Controls */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .form-group label {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            font-weight: 500;
             color: var(--text-muted);
             margin-bottom: 6px;
         }
@@ -153,6 +160,7 @@
         .form-group label span.val {
             color: var(--accent-cyan);
             font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
         }
 
         input[type="range"] {
@@ -168,56 +176,31 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .toggle-group span {
-            font-size: 13px;
-            color: var(--text-main);
         }
 
         .switch {
             position: relative;
             display: inline-block;
-            width: 44px;
-            height: 24px;
+            width: 42px;
+            height: 22px;
         }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .switch input { opacity: 0; width: 0; height: 0; }
 
         .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255, 255, 255, 0.15);
-            transition: .3s;
-            border-radius: 24px;
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.15); transition: .3s; border-radius: 24px;
         }
 
         .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
+            position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%;
         }
 
-        input:checked + .slider {
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
+        input:checked + .slider { background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
         .btn-primary {
             width: 100%;
@@ -231,7 +214,7 @@
             cursor: pointer;
             box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3);
             transition: all 0.3s ease;
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
         .btn-primary:hover {
@@ -239,46 +222,48 @@
             box-shadow: 0 8px 30px rgba(0, 242, 254, 0.5);
         }
 
-        /* Score Meter */
-        .score-hero {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 20px 0;
-            background: rgba(0, 0, 0, 0.2);
+        .dashboard-hero {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 24px;
+            background: rgba(0, 0, 0, 0.25);
             border-radius: 16px;
+            padding: 20px;
             margin-bottom: 24px;
+            align-items: center;
         }
 
-        .score-gauge {
+        @media (max-width: 768px) {
+            .dashboard-hero { grid-template-columns: 1fr; }
+        }
+
+        .score-gauge-wrap {
             position: relative;
-            width: 140px;
-            height: 140px;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .score-gauge svg {
-            width: 140px;
-            height: 140px;
+        .score-gauge-wrap svg {
+            width: 160px;
+            height: 160px;
             transform: rotate(-90deg);
         }
 
-        .score-gauge circle {
+        .score-gauge-wrap circle {
             fill: none;
-            stroke-width: 10;
+            stroke-width: 12;
             stroke-linecap: round;
         }
 
-        .circle-bg {
-            stroke: rgba(255, 255, 255, 0.08);
-        }
-
+        .circle-bg { stroke: rgba(255, 255, 255, 0.08); }
         .circle-fill {
             stroke: url(#scoreGradient);
-            stroke-dasharray: 377;
-            stroke-dashoffset: 100;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
             transition: stroke-dashoffset 1s ease-in-out;
         }
 
@@ -288,7 +273,7 @@
         }
 
         .score-num {
-            font-size: 38px;
+            font-size: 44px;
             font-weight: 800;
             font-family: 'JetBrains Mono', monospace;
             background: linear-gradient(90deg, #ffffff, var(--accent-cyan));
@@ -299,39 +284,30 @@
         .score-label {
             font-size: 11px;
             color: var(--text-muted);
-            text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .meta-list {
+        /* Radar Chart Canvas */
+        .radar-container {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .meta-item {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .meta-item strong {
-            color: var(--text-main);
+            justify-content: center;
+            align-items: center;
+            height: 180px;
         }
 
         /* Dimensions Grid */
         .dimensions-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
             margin-bottom: 24px;
         }
 
         .dim-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 14px;
-            transition: background 0.3s ease;
+            border-radius: 12px;
+            padding: 12px;
         }
 
         .dim-header {
@@ -340,100 +316,69 @@
             font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: capitalize;
         }
 
         .dim-score {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
             color: var(--accent-cyan);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .bar-container {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 3px;
-            overflow: hidden;
+            width: 100%; height: 5px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden;
         }
 
         .bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
-            width: 0%;
-            transition: width 0.8s ease;
+            height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); width: 0%; transition: width 0.8s ease;
         }
 
-        /* Barriers & Interventions */
         .two-col {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
 
-        @media (max-width: 768px) {
-            .two-col {
-                grid-template-columns: 1fr;
-            }
-        }
+        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
 
         .barrier-card {
             background: rgba(255, 82, 82, 0.08);
             border: 1px solid rgba(255, 82, 82, 0.3);
             border-radius: 12px;
-            padding: 12px 16px;
+            padding: 12px 14px;
             margin-bottom: 10px;
         }
 
         .barrier-title {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--accent-red);
+            display: flex; justify-content: space-between; font-weight: 600; font-size: 13px; color: var(--accent-red);
         }
 
         .barrier-sev {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: rgba(255, 82, 82, 0.2);
-            text-transform: uppercase;
+            font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(255, 82, 82, 0.2); text-transform: uppercase;
         }
 
         .intervention-card {
             background: rgba(0, 230, 118, 0.08);
             border: 1px solid rgba(0, 230, 118, 0.3);
             border-radius: 12px;
-            padding: 12px 16px;
+            padding: 12px 14px;
             margin-bottom: 10px;
         }
 
         .intervention-title {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--accent-green);
+            display: flex; justify-content: space-between; font-weight: 600; font-size: 13px; color: var(--accent-green);
         }
 
         .btn-exec {
-            background: var(--accent-green);
-            color: #000;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 8px;
+            background: var(--accent-green); color: #000; border: none; padding: 6px 12px; border-radius: 8px;
+            font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 8px;
         }
 
         .console-output {
-            background: #050811;
+            background: #040711;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 14px;
@@ -443,7 +388,7 @@
             max-height: 180px;
             overflow-y: auto;
             white-space: pre-wrap;
-            margin-top: 14px;
+            margin-top: 16px;
         }
     </style>
 </head>
@@ -453,41 +398,50 @@
         <div class="header-title">
             <div class="logo-icon">F</div>
             <div>
-                <h1>Financial Access Intelligence Layer</h1>
-                <div class="subtitle">Open Payments & Interledger Access Intelligence Console</div>
+                <h1>Financial Access Intelligence Command Center</h1>
+                <div class="subtitle">Multi-Model FAI Scoring Engine & Interledger Open Payments Intervention Router</div>
             </div>
         </div>
-        <div class="badge-op">⚡ Open Payments Active</div>
+        
+        <div class="model-select-wrapper">
+            <label>Scoring Model:</label>
+            <select id="scoring_methodology" class="model-select" onchange="calculateFAI()">
+                <option value="DETERMINISTIC_RULES">v0.1 Deterministic Rules Engine</option>
+                <option value="STATISTICAL_COHORT">v0.2 Statistical Cohort Z-Score</option>
+                <option value="ML_XGBOOST" selected>v0.3 Machine Learning XGBoost</option>
+                <option value="NON_LINEAR_MCDA">v0.4 Non-Linear MCDA Entropy</option>
+            </select>
+        </div>
     </div>
 
     <div class="main-grid">
-        <!-- Telemetry Simulator Panel -->
+        <!-- Telemetry Form -->
         <div class="card">
             <div class="card-title">
-                <span>Telemetry Input Simulator</span>
-                <small style="color:var(--text-muted); font-size:11px;">Real-time Telemetry</small>
+                <span>Real-Time Telemetry Ingestion</span>
+                <small style="color:var(--text-muted); font-size:11px;">Profile: 3fa85f64</small>
             </div>
 
             <div class="form-group">
-                <label>Wallet Count <span class="val" id="val_wallet_count">2</span></label>
+                <label>Wallet Address Count <span class="val" id="val_wallet_count">2</span></label>
                 <input type="range" id="wallet_count" min="0" max="5" value="2" oninput="updateVal('wallet_count')">
             </div>
 
             <div class="toggle-group">
-                <span>ILP Node Reachable</span>
+                <span style="font-size:13px;">ILP Node Reachable</span>
                 <label class="switch">
                     <input type="checkbox" id="ilp_reachable" checked>
                     <span class="slider"></span>
                 </label>
             </div>
 
-            <div class="form-group" style="margin-top:12px;">
-                <label>Transaction Success Rate (%) <span class="val" id="val_tx_success_rate">95%</span></label>
+            <div class="form-group" style="margin-top:10px;">
+                <label>Tx Success Rate (%) <span class="val" id="val_tx_success_rate">95%</span></label>
                 <input type="range" id="tx_success_rate" min="0" max="100" value="95" oninput="updateVal('tx_success_rate', '%')">
             </div>
 
             <div class="form-group">
-                <label>Avg Latency (ms) <span class="val" id="val_avg_connection_latency_ms">250ms</span></label>
+                <label>Connection Latency (ms) <span class="val" id="val_avg_connection_latency_ms">250ms</span></label>
                 <input type="range" id="avg_connection_latency_ms" min="50" max="3000" value="250" oninput="updateVal('avg_connection_latency_ms', 'ms')">
             </div>
 
@@ -512,26 +466,26 @@
             </div>
 
             <div class="toggle-group">
-                <span>Fallback Route Available</span>
+                <span style="font-size:13px;">Fallback Route Available</span>
                 <label class="switch">
                     <input type="checkbox" id="fallback_route_available" checked>
                     <span class="slider"></span>
                 </label>
             </div>
 
-            <button class="btn-primary" onclick="calculateFAI()">Calculate FAI Index & Barriers</button>
+            <button class="btn-primary" onclick="calculateFAI()">Run Multi-Model FAI Ingestion</button>
         </div>
 
-        <!-- FAI Dashboard Output -->
+        <!-- Dashboard Outputs -->
         <div>
             <div class="card" style="margin-bottom: 24px;">
                 <div class="card-title">
-                    <span>Financial Access Index (FAI) Snapshot</span>
-                    <small id="scoring_version_badge" style="color:var(--accent-cyan); font-family:'JetBrains Mono'; font-size:11px;">v0.1-rule-based</small>
+                    <span>Financial Access Index Snapshot</span>
+                    <span id="active_methodology_badge" style="color:var(--accent-cyan); font-family:'JetBrains Mono'; font-size:12px;">GRADIENT_BOOSTING_ENSEMBLE</span>
                 </div>
 
-                <div class="score-hero">
-                    <div class="score-gauge">
+                <div class="dashboard-hero">
+                    <div class="score-gauge-wrap">
                         <svg>
                             <defs>
                                 <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -539,58 +493,96 @@
                                     <stop offset="100%" stop-color="#00f2fe"/>
                                 </linearGradient>
                             </defs>
-                            <circle class="circle-bg" cx="70" cy="70" r="60"></circle>
-                            <circle class="circle-fill" id="score_circle" cx="70" cy="70" r="60"></circle>
+                            <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
+                            <circle class="circle-fill" id="score_circle" cx="80" cy="80" r="70"></circle>
                         </svg>
                         <div class="score-value">
                             <div class="score-num" id="overall_score_val">0</div>
-                            <div class="score-label">FAI INDEX</div>
+                            <div class="score-label">FAI SCORE</div>
                         </div>
                     </div>
 
-                    <div class="meta-list">
-                        <div class="meta-item">Profile ID: <strong id="profile_id_val">--</strong></div>
-                        <div class="meta-item">Methodology: <strong id="methodology_val">DETERMINISTIC_RULES</strong></div>
-                        <div class="meta-item">Calculated: <strong id="calculated_at_val">--</strong></div>
-                        <div class="meta-item">Status: <strong style="color:var(--accent-green);">HEALTHY</strong></div>
+                    <!-- Radar Canvas -->
+                    <div class="radar-container">
+                        <canvas id="radarCanvas" width="260" height="180"></canvas>
                     </div>
                 </div>
 
-                <div class="card-title" style="font-size:14px;">7 Dimensions Breakdown</div>
-                <div class="dimensions-grid" id="dimensions_container">
-                    <!-- Dimension Cards Generated via JS -->
-                </div>
+                <div class="card-title" style="font-size:14px;">7 Dimensions Matrix Breakdown</div>
+                <div class="dimensions-grid" id="dimensions_container"></div>
             </div>
 
-            <!-- Barriers & Interventions Row -->
+            <!-- Barriers & Interventions -->
             <div class="two-col">
                 <div class="card">
                     <div class="card-title" style="color:var(--accent-red);">Diagnosed Barriers</div>
-                    <div id="barriers_container">
-                        <div style="font-size:12px; color:var(--text-muted);">No barriers detected. Run calculation above.</div>
-                    </div>
+                    <div id="barriers_container"></div>
                 </div>
 
                 <div class="card">
                     <div class="card-title" style="color:var(--accent-green);">Recommended Interventions</div>
-                    <div id="interventions_container">
-                        <div style="font-size:12px; color:var(--text-muted);">No active recommendations.</div>
-                    </div>
+                    <div id="interventions_container"></div>
                 </div>
             </div>
 
-            <div class="console-output" id="console_output">System ready. Ingestion pipeline standing by...</div>
+            <div class="console-output" id="console_output">System initialized. Model registry ready.</div>
         </div>
     </div>
 
     <script>
         const profileId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
-        document.getElementById('profile_id_val').innerText = profileId.substring(0, 8) + '...';
 
         function updateVal(id, unit = '', prefix = false) {
             const val = document.getElementById(id).value;
-            const display = prefix ? unit + val : val + unit;
-            document.getElementById('val_' + id).innerText = display;
+            document.getElementById('val_' + id).innerText = prefix ? unit + val : val + unit;
+        }
+
+        function drawRadarChart(scoresMap) {
+            const canvas = document.getElementById('radarCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 65;
+            const labels = Object.keys(scoresMap);
+            const total = labels.length;
+
+            // Draw Web Grid
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            for (let r = 1; r <= 3; r++) {
+                ctx.beginPath();
+                const levelRadius = (radius / 3) * r;
+                for (let i = 0; i < total; i++) {
+                    const angle = (Math.PI * 2 / total) * i - Math.PI / 2;
+                    const x = centerX + levelRadius * Math.cos(angle);
+                    const y = centerY + levelRadius * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            // Draw Data Polygon
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(0, 242, 254, 0.25)';
+            ctx.strokeStyle = '#00f2fe';
+            ctx.lineWidth = 2;
+
+            labels.forEach((dim, i) => {
+                const score = scoresMap[dim] || 0;
+                const r = (score / 100) * radius;
+                const angle = (Math.PI * 2 / total) * i - Math.PI / 2;
+                const x = centerX + r * Math.cos(angle);
+                const y = centerY + r * Math.sin(angle);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
         }
 
         async function calculateFAI() {
@@ -599,7 +591,8 @@
                 con.innerText = `[${new Date().toLocaleTimeString()}] ${msg}\n` + con.innerText;
             };
 
-            log("Submitting feature vector to FAI Scoring Engine...");
+            const methodology = document.getElementById('scoring_methodology').value;
+            log(`Running FAI Calculation with engine: ${methodology}...`);
 
             const payload = {
                 profile_id: profileId,
@@ -613,7 +606,8 @@
                 tx_frequency_monthly: parseInt(document.getElementById('tx_frequency_monthly').value),
                 tx_volume_monthly_usd: 250.0,
                 reserve_liquidity_usd: parseFloat(document.getElementById('reserve_liquidity_usd').value),
-                fallback_route_available: document.getElementById('fallback_route_available').checked
+                fallback_route_available: document.getElementById('fallback_route_available').checked,
+                methodology: methodology
             };
 
             try {
@@ -624,16 +618,19 @@
                 });
                 const data = await res.json();
 
-                // Update Gauge
+                // Update Score & Gauge
                 const score = data.overall_score;
                 document.getElementById('overall_score_val').innerText = score;
-                const offset = 377 - (377 * (score / 100));
+                const offset = 440 - (440 * (score / 100));
                 document.getElementById('score_circle').style.strokeDashoffset = offset;
-                document.getElementById('calculated_at_val').innerText = new Date(data.calculated_at).toLocaleTimeString();
+                document.getElementById('active_methodology_badge').innerText = data.methodology;
 
-                log(`FAI Score Calculated: ${score}/100. Diagnosed ${data.barriers.length} barriers.`);
+                log(`FAI Calculated: ${score}/100 (${data.scoring_version}). Diagnosed ${data.barriers.length} barriers.`);
 
-                // Update Dimensions
+                // Draw Radar Chart
+                drawRadarChart(data.dimension_scores);
+
+                // Update Dimensions Cards
                 const dimContainer = document.getElementById('dimensions_container');
                 dimContainer.innerHTML = '';
                 for (const [dim, s] of Object.entries(data.dimension_scores)) {
@@ -655,7 +652,8 @@
                 const barContainer = document.getElementById('barriers_container');
                 barContainer.innerHTML = '';
                 if (data.barriers.length === 0) {
-                    barContainer.innerHTML = `<div style="font-size:12px; color:var(--accent-green);">No structural barriers diagnosed! High financial access.</div>`;
+                    barContainer.innerHTML = `<div style="font-size:12px; color:var(--accent-green);">No barriers detected. High financial inclusion!</div>`;
+                    document.getElementById('interventions_container').innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No active recommendations needed.</div>`;
                 } else {
                     data.barriers.forEach(b => {
                         barContainer.innerHTML += `
@@ -667,7 +665,6 @@
                             </div>
                         `;
                     });
-                    // Trigger Interventions Recommendation
                     fetchInterventions(data.barriers);
                 }
 
@@ -695,7 +692,7 @@
                                 <span>${i.intervention_type}</span>
                                 <span style="font-size:10px; text-transform:uppercase;">${i.status}</span>
                             </div>
-                            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">${i.metadata.description || 'Open Payments Action'}</div>
+                            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">${i.metadata.description || 'Open Payments Intervention Routing'}</div>
                             <button class="btn-exec" onclick="executeOpenPayment('${i.intervention_id}')">Execute via Open Payments</button>
                         </div>
                     `;
@@ -723,6 +720,16 @@
                 });
                 const data = await res.json();
                 con.innerText = `[${new Date().toLocaleTimeString()}] Open Payments Executed Successfully! Outgoing ID: ${data.open_payments_outgoing_id} (Fee: $${data.estimated_fee})\n` + con.innerText;
+                
+                // Simulate Post-Intervention FAI Delta jump
+                setTimeout(() => {
+                    con.innerText = `[${new Date().toLocaleTimeString()}] Post-Intervention FAI Recalculated! Fee burden reduced by 35%. FAI Index boosted.\n` + con.innerText;
+                    // Lower fee ratio on slider to simulate improvement
+                    document.getElementById('fee_to_volume_ratio').value = "0.5";
+                    updateVal('fee_to_volume_ratio', '%');
+                    calculateFAI();
+                }, 1200);
+
             } catch (err) {
                 con.innerText = `[${new Date().toLocaleTimeString()}] Payment Execution Error: ${err.message}\n` + con.innerText;
             }

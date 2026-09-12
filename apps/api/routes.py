@@ -47,6 +47,7 @@ class FeatureIngestionSchema(BaseModel):
     tx_volume_monthly_usd: float = Field(default=250.0, ge=0.0)
     reserve_liquidity_usd: float = Field(default=50.0, ge=0.0)
     fallback_route_available: bool = Field(default=True)
+    methodology: str = Field(default="DETERMINISTIC_RULES")
 
 
 class ExecuteInterventionRequestSchema(BaseModel):
@@ -80,6 +81,7 @@ async def calculate_fai_score(payload: FeatureIngestionSchema) -> Dict[str, Any]
         tx_volume_monthly_usd=payload.tx_volume_monthly_usd,
         reserve_liquidity_usd=payload.reserve_liquidity_usd,
         fallback_route_available=payload.fallback_route_available,
+        methodology=payload.methodology,
     )
     result = use_case.execute(request_dto)
     return {
@@ -89,6 +91,7 @@ async def calculate_fai_score(payload: FeatureIngestionSchema) -> Dict[str, Any]
         "dimension_scores": result.dimension_scores,
         "barriers": [b.__dict__ for b in result.barriers],
         "scoring_version": result.scoring_version,
+        "methodology": result.methodology,
         "calculated_at": result.calculated_at,
     }
 

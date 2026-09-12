@@ -10,6 +10,9 @@ from src.domain.access_index.scoring import (
     DeterministicRuleScoringEngine,
 )
 from src.domain.barriers.barriers import BarrierDetectionService
+from src.infrastructure.ml.scoring.statistical import StatisticalScoringEngine
+from src.infrastructure.ml.scoring.xgboost_engine import XGBoostMLScoringEngine
+from src.infrastructure.ml.scoring.mcda import MCDAScoringEngine
 
 
 class CalculateFAIScoreUseCase:
@@ -20,10 +23,19 @@ class CalculateFAIScoreUseCase:
         scoring_engine: IFAIScoringEngine = None,
         barrier_detector: BarrierDetectionService = None,
     ) -> None:
-        self.scoring_engine = scoring_engine or DeterministicRuleScoringEngine()
+        self.default_scoring_engine = scoring_engine or DeterministicRuleScoringEngine()
         self.barrier_detector = barrier_detector or BarrierDetectionService()
+        self._engines = {
+            "DETERMINISTIC_RULES": DeterministicRuleScoringEngine(),
+            "STATISTICAL_COHORT": StatisticalScoringEngine(),
+            "ML_XGBOOST": XGBoostMLScoringEngine(),
+            "NON_LINEAR_MCDA": MCDAScoringEngine(),
+        }
 
     def execute(self, request: CalculateFAIScoreRequestDTO) -> FAIScoreResponseDTO:
+        # Select engine based on request methodology
+        engine = self._engines.get(request.methodology, self.default_scoring_engine)
+
         # 1. Map DTO to Domain FeatureVector
         features = FeatureVector(
             wallet_count=request.wallet_count,
@@ -40,7 +52,7 @@ class CalculateFAIScoreUseCase:
         )
 
         # 2. Calculate FAI Score
-        fai_score = self.scoring_engine.calculate_score(
+        fai_score = engine.calculate_score(
             profile_id=request.profile_id,
             features=features,
         )
@@ -72,5 +84,6 @@ class CalculateFAIScoreUseCase:
             dimension_scores=dim_scores_map,
             barriers=barrier_dtos,
             scoring_version=fai_score.scoring_version,
+            methodology=fai_score.methodology,
             calculated_at=fai_score.calculated_at.isoformat(),
         )

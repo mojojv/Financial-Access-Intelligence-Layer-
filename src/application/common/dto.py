@@ -19,6 +19,7 @@ class CalculateFAIScoreRequestDTO:
     tx_volume_monthly_usd: float
     reserve_liquidity_usd: float
     fallback_route_available: bool
+    methodology: str = "DETERMINISTIC_RULES"
 
 
 @dataclass(frozen=True)
@@ -38,6 +39,7 @@ class FAIScoreResponseDTO:
     dimension_scores: Dict[str, float]
     barriers: List[BarrierResponseDTO]
     scoring_version: str
+    methodology: str
     calculated_at: str
 
 
