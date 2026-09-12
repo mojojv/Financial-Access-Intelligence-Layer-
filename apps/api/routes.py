@@ -149,43 +149,57 @@ async def recommend_interventions(barriers_payload: List[Dict[str, Any]]) -> Dic
 @router.post("/api/v1/payments/execute", tags=["Open Payments Execution"])
 async def execute_intervention_payment(payload: ExecuteInterventionRequestSchema) -> Dict[str, Any]:
     """Executes a financial intervention via Open Payments ACL."""
+    from src.domain.shared.value_objects import Money, WalletAddress
+    from uuid import uuid4 as _uuid4
+
     op_acl = MockOpenPaymentsACLAdapter()
 
-    # 1. Discover Wallet
-    wallet = await op_acl.discover_wallet(payload.receiver_wallet)
+    sender_wallet = WalletAddress(url=payload.sender_wallet)
+    receiver_wallet = WalletAddress(url=payload.receiver_wallet)
+    amount = Money(amount=Decimal(str(payload.amount)), asset_code=payload.asset_code, asset_scale=2)
 
-    # 2. GNAP Grant Request
-    grant = await op_acl.request_grant(wallet.auth_server, client_key_id="key-1")
+    # 1. Resolve receiver Wallet Address metadata
+    wallet_metadata = await op_acl.resolve_wallet(receiver_wallet)
 
-    # 3. Create Incoming Payment
+    # 2. Simulate GNAP access token (in production: call authorization server)
+    access_token = f"gnap-token-{_uuid4()}"
+
+    # 3. Create Incoming Payment on receiver's resource server
     inc_payment = await op_acl.create_incoming_payment(
-        wallet_url=payload.receiver_wallet,
-        amount=Decimal(str(payload.amount)),
-        asset_code=payload.asset_code,
-        token=grant.access_token,
+        wallet_address=receiver_wallet,
+        amount=amount,
+        access_token=access_token,
     )
 
-    # 4. Request Quote
-    quote = await op_acl.request_quote(
-        sender_wallet_url=payload.sender_wallet,
-        receiver_incoming_payment_url=inc_payment.id,
-        token=grant.access_token,
+    incoming_payment_id = inc_payment.get("id", f"{receiver_wallet.url}/incoming-payments/{_uuid4()}")
+
+    # 4. Request Quote from sender's resource server
+    quote = await op_acl.get_quote(
+        sender_wallet=sender_wallet,
+        receiver_incoming_payment_url=incoming_payment_id,
+        access_token=access_token,
     )
 
-    # 5. Outgoing Payment
+    quote_id = quote.get("id", f"{sender_wallet.url}/quotes/{_uuid4()}")
+    estimated_fee = quote.get("estimatedFee", {}).get("value", "0")
+
+    # 5. Create Outgoing Payment
     outgoing = await op_acl.create_outgoing_payment(
-        sender_wallet_url=payload.sender_wallet,
-        quote_id=quote.id,
-        token=grant.access_token,
+        sender_wallet=sender_wallet,
+        quote_url=quote_id,
+        access_token=access_token,
     )
+
+    debit_amount = outgoing.get("debitAmount", {}).get("value", "0")
 
     return {
         "status": "SUCCESS",
         "intervention_id": str(payload.intervention_id),
-        "open_payments_outgoing_id": outgoing.id,
-        "debit_amount": float(outgoing.debit_amount),
-        "asset_code": outgoing.asset_code,
-        "estimated_fee": float(quote.estimated_fee),
+        "open_payments_outgoing_id": outgoing.get("id", ""),
+        "debit_amount": float(int(debit_amount)) / 100,
+        "asset_code": payload.asset_code,
+        "estimated_fee": float(int(estimated_fee)) / 100,
+        "wallet_metadata": wallet_metadata,
     }
 
 

@@ -13,7 +13,11 @@ from src.integrations.open_payments.ports import (
     IQuoteService,
     IOutgoingPaymentService,
 )
-from src.integrations.open_payments.client import MockOpenPaymentsACLAdapter
+from src.integrations.open_payments.client import (
+    OpenPaymentsACLClient,
+    MockOpenPaymentsACLAdapter,
+)
+from src.integrations.open_payments.mapper import OpenPaymentsMapper
 
 __all__ = [
     "WalletMetadataDTO",
@@ -26,5 +30,7 @@ __all__ = [
     "IIncomingPaymentService",
     "IQuoteService",
     "IOutgoingPaymentService",
+    "OpenPaymentsACLClient",
     "MockOpenPaymentsACLAdapter",
+    "OpenPaymentsMapper",
 ]
