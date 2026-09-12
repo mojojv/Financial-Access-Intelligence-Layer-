@@ -30,6 +30,8 @@ from src.domain.barriers.barriers import Barrier, BarrierCode, BarrierSeverity
 from src.domain.access_index.dimensions import DimensionType
 from src.domain.interventions.interventions import InterventionEngine
 from src.integrations.open_payments.client import MockOpenPaymentsACLAdapter
+from src.infrastructure.ml.models.fee_optimizer import ILPLiquidityFeePredictor
+from src.application.access_index.exporter import FinancialAccessAuditReportExporter
 
 router = APIRouter()
 
@@ -56,6 +58,18 @@ class ExecuteInterventionRequestSchema(BaseModel):
     receiver_wallet: str
     amount: float = Field(gt=0)
     asset_code: str = Field(default="USD")
+
+
+class RouteOptimizationRequestSchema(BaseModel):
+    source_asset: str = Field(default="USD")
+    destination_asset: str = Field(default="EUR")
+    amount_usd: float = Field(default=100.0, gt=0)
+
+
+class ReportExportRequestSchema(BaseModel):
+    profile_id: UUID
+    fai_score_data: Dict[str, Any]
+    interventions_executed: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 @router.get("/health", tags=["Health"])
@@ -173,3 +187,27 @@ async def execute_intervention_payment(payload: ExecuteInterventionRequestSchema
         "asset_code": outgoing.asset_code,
         "estimated_fee": float(quote.estimated_fee),
     }
+
+
+@router.post("/api/v1/routes/optimize", tags=["Predictive Routing"])
+async def optimize_route(payload: RouteOptimizationRequestSchema) -> Dict[str, Any]:
+    """Predicts optimal Open Payments ILP route using ML fee predictor."""
+    predictor = ILPLiquidityFeePredictor()
+    res = predictor.predict_optimal_route(
+        source_asset=payload.source_asset,
+        destination_asset=payload.destination_asset,
+        amount_usd=payload.amount_usd,
+    )
+    return res.__dict__
+
+
+@router.post("/api/v1/reports/export", tags=["Audit Exporter"])
+async def export_audit_report(payload: ReportExportRequestSchema) -> Dict[str, Any]:
+    """Generates a downloadable Financial Access Audit Report."""
+    exporter = FinancialAccessAuditReportExporter()
+    res = exporter.generate_report(
+        profile_id=payload.profile_id,
+        fai_score_data=payload.fai_score_data,
+        interventions_executed=payload.interventions_executed,
+    )
+    return res

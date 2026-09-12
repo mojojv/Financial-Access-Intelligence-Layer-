@@ -23,373 +23,148 @@
             --text-muted: #94a3b8;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
+            background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh;
             background-image: 
                 radial-gradient(circle at 15% 15%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
                 radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.12) 0%, transparent 45%);
-            background-attachment: fixed;
-            padding: 24px;
+            background-attachment: fixed; padding: 24px;
         }
 
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1440px;
-            margin: 0 auto 28px auto;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--card-border);
+            display: flex; justify-content: space-between; align-items: center; max-width: 1440px; margin: 0 auto 28px auto;
+            padding-bottom: 20px; border-bottom: 1px solid var(--card-border);
         }
 
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .header-title { display: flex; align-items: center; gap: 16px; }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 24px;
+            width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 24px;
             box-shadow: 0 0 24px rgba(0, 242, 254, 0.4);
         }
 
-        h1 {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(90deg, #ffffff, var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(90deg, #ffffff, var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { font-size: 13px; color: var(--text-muted); }
 
-        .subtitle {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
+        .header-actions { display: flex; align-items: center; gap: 14px; }
 
         .model-select-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.04);
-            padding: 8px 16px;
-            border-radius: 16px;
-            border: 1px solid var(--card-border);
+            display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.04); padding: 8px 14px;
+            border-radius: 14px; border: 1px solid var(--card-border);
         }
 
-        .model-select-wrapper label {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
+        .model-select-wrapper label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
 
         select.model-select {
-            background: var(--bg-dark);
-            color: var(--accent-cyan);
-            border: 1px solid rgba(0, 242, 254, 0.3);
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            outline: none;
-            cursor: pointer;
+            background: var(--bg-dark); color: var(--accent-cyan); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 8px;
+            padding: 6px 12px; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; outline: none; cursor: pointer;
         }
 
-        .main-grid {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 24px;
-            max-width: 1440px;
-            margin: 0 auto;
+        .btn-report {
+            background: rgba(0, 242, 254, 0.1); border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
+            padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s;
         }
 
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        .btn-report:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); }
+
+        .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; max-width: 1440px; margin: 0 auto; }
+
+        @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
 
         .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--card-border);
+            border-radius: 20px; padding: 24px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); margin-bottom: 24px;
         }
 
-        .card-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
 
-        .form-group {
-            margin-bottom: 14px;
-        }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+        .form-group label span.val { color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
 
-        .form-group label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
+        input[type="range"] { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; outline: none; accent-color: var(--accent-cyan); }
 
-        .form-group label span.val {
-            color: var(--accent-cyan);
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-        }
+        .toggle-group { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            outline: none;
-            accent-color: var(--accent-cyan);
-        }
-
-        .toggle-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 42px;
-            height: 22px;
-        }
-
+        .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255, 255, 255, 0.15); transition: .3s; border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
-            background-color: white; transition: .3s; border-radius: 50%;
-        }
-
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.15); transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }
         input:checked + .slider:before { transform: translateX(20px); }
 
         .btn-primary {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            border: none;
-            border-radius: 12px;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3);
-            transition: all 0.3s ease;
-            margin-top: 12px;
+            width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none; border-radius: 12px; color: #ffffff; font-size: 14px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3); transition: all 0.3s ease; margin-top: 12px;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 242, 254, 0.5);
-        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 242, 254, 0.5); }
 
         .dashboard-hero {
-            display: grid;
-            grid-template-columns: 240px 1fr;
-            gap: 24px;
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 24px;
-            align-items: center;
+            display: grid; grid-template-columns: 220px 1fr; gap: 20px; background: rgba(0, 0, 0, 0.25);
+            border-radius: 16px; padding: 20px; margin-bottom: 24px; align-items: center;
         }
 
-        @media (max-width: 768px) {
-            .dashboard-hero { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 768px) { .dashboard-hero { grid-template-columns: 1fr; } }
 
-        .score-gauge-wrap {
-            position: relative;
-            width: 160px;
-            height: 160px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .score-gauge-wrap svg {
-            width: 160px;
-            height: 160px;
-            transform: rotate(-90deg);
-        }
-
-        .score-gauge-wrap circle {
-            fill: none;
-            stroke-width: 12;
-            stroke-linecap: round;
-        }
-
+        .score-gauge-wrap { position: relative; width: 160px; height: 160px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+        .score-gauge-wrap svg { width: 160px; height: 160px; transform: rotate(-90deg); }
+        .score-gauge-wrap circle { fill: none; stroke-width: 12; stroke-linecap: round; }
         .circle-bg { stroke: rgba(255, 255, 255, 0.08); }
-        .circle-fill {
-            stroke: url(#scoreGradient);
-            stroke-dasharray: 440;
-            stroke-dashoffset: 440;
-            transition: stroke-dashoffset 1s ease-in-out;
-        }
+        .circle-fill { stroke: url(#scoreGradient); stroke-dasharray: 440; stroke-dashoffset: 440; transition: stroke-dashoffset 1s ease-in-out; }
+        .score-value { position: absolute; text-align: center; }
+        .score-num { font-size: 44px; font-weight: 800; font-family: 'JetBrains Mono', monospace; background: linear-gradient(90deg, #ffffff, var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .score-label { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; }
 
-        .score-value {
-            position: absolute;
-            text-align: center;
-        }
+        .radar-container { display: flex; justify-content: center; align-items: center; height: 180px; }
 
-        .score-num {
-            font-size: 44px;
-            font-weight: 800;
-            font-family: 'JetBrains Mono', monospace;
-            background: linear-gradient(90deg, #ffffff, var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .dimensions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+        .dim-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px; }
+        .dim-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: capitalize; }
+        .dim-score { font-size: 18px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--accent-cyan); margin-bottom: 6px; }
+        .bar-container { width: 100%; height: 5px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); width: 0%; transition: width 0.8s ease; }
 
-        .score-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-        }
-
-        /* Radar Chart Canvas */
-        .radar-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 180px;
-        }
-
-        /* Dimensions Grid */
-        .dimensions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .dim-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 12px;
-        }
-
-        .dim-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            text-transform: capitalize;
-        }
-
-        .dim-score {
-            font-size: 18px;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--accent-cyan);
-            margin-bottom: 6px;
-        }
-
-        .bar-container {
-            width: 100%; height: 5px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden;
-        }
-
-        .bar-fill {
-            height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); width: 0%; transition: width 0.8s ease;
-        }
-
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
 
-        .barrier-card {
-            background: rgba(255, 82, 82, 0.08);
-            border: 1px solid rgba(255, 82, 82, 0.3);
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 10px;
-        }
+        .barrier-card { background: rgba(255, 82, 82, 0.08); border: 1px solid rgba(255, 82, 82, 0.3); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+        .barrier-title { display: flex; justify-content: space-between; font-weight: 600; font-size: 13px; color: var(--accent-red); }
+        .barrier-sev { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(255, 82, 82, 0.2); text-transform: uppercase; }
 
-        .barrier-title {
-            display: flex; justify-content: space-between; font-weight: 600; font-size: 13px; color: var(--accent-red);
-        }
+        .intervention-card { background: rgba(0, 230, 118, 0.08); border: 1px solid rgba(0, 230, 118, 0.3); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+        .intervention-title { display: flex; justify-content: space-between; font-weight: 600; font-size: 13px; color: var(--accent-green); }
+        .btn-exec { background: var(--accent-green); color: #000; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 8px; }
 
-        .barrier-sev {
-            font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(255, 82, 82, 0.2); text-transform: uppercase;
-        }
-
-        .intervention-card {
-            background: rgba(0, 230, 118, 0.08);
-            border: 1px solid rgba(0, 230, 118, 0.3);
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 10px;
-        }
-
-        .intervention-title {
-            display: flex; justify-content: space-between; font-weight: 600; font-size: 13px; color: var(--accent-green);
-        }
-
-        .btn-exec {
-            background: var(--accent-green); color: #000; border: none; padding: 6px 12px; border-radius: 8px;
-            font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 8px;
-        }
+        /* Optimizer Section */
+        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+        .opt-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 12px; }
+        .opt-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .opt-val { font-size: 14px; font-weight: 700; color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; }
 
         .console-output {
-            background: #040711;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 14px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            color: var(--accent-cyan);
-            max-height: 180px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            margin-top: 16px;
+            background: #040711; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px;
+            font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-cyan); max-height: 180px; overflow-y: auto; white-space: pre-wrap;
         }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 999;
+        }
+
+        .modal-content {
+            background: #0b1120; border: 1px solid var(--accent-cyan); border-radius: 20px; width: 90%; max-width: 700px; padding: 28px;
+            max-height: 85vh; overflow-y: auto; box-shadow: 0 0 50px rgba(0, 242, 254, 0.3);
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 12px; }
+        .modal-title { font-size: 18px; font-weight: 700; color: var(--accent-cyan); }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -399,86 +174,133 @@
             <div class="logo-icon">F</div>
             <div>
                 <h1>Financial Access Intelligence Command Center</h1>
-                <div class="subtitle">Multi-Model FAI Scoring Engine & Interledger Open Payments Intervention Router</div>
+                <div class="subtitle">Multi-Model FAI Scoring Engine & Interledger Open Payments Smart Router</div>
             </div>
         </div>
         
-        <div class="model-select-wrapper">
-            <label>Scoring Model:</label>
-            <select id="scoring_methodology" class="model-select" onchange="calculateFAI()">
-                <option value="DETERMINISTIC_RULES">v0.1 Deterministic Rules Engine</option>
-                <option value="STATISTICAL_COHORT">v0.2 Statistical Cohort Z-Score</option>
-                <option value="ML_XGBOOST" selected>v0.3 Machine Learning XGBoost</option>
-                <option value="NON_LINEAR_MCDA">v0.4 Non-Linear MCDA Entropy</option>
-            </select>
+        <div class="header-actions">
+            <div class="model-select-wrapper">
+                <label>Model:</label>
+                <select id="scoring_methodology" class="model-select" onchange="calculateFAI()">
+                    <option value="DETERMINISTIC_RULES">v0.1 Deterministic Rules</option>
+                    <option value="STATISTICAL_COHORT">v0.2 Statistical Cohort Z-Score</option>
+                    <option value="ML_XGBOOST" selected>v0.3 Machine Learning XGBoost</option>
+                    <option value="NON_LINEAR_MCDA">v0.4 Non-Linear MCDA Entropy</option>
+                </select>
+            </div>
+            <button class="btn-report" onclick="exportAuditReport()">Export Audit Report 📄</button>
         </div>
     </div>
 
     <div class="main-grid">
-        <!-- Telemetry Form -->
-        <div class="card">
-            <div class="card-title">
-                <span>Real-Time Telemetry Ingestion</span>
-                <small style="color:var(--text-muted); font-size:11px;">Profile: 3fa85f64</small>
+        <!-- Sidebar Controls -->
+        <div>
+            <!-- Telemetry Form -->
+            <div class="card">
+                <div class="card-title">
+                    <span>Telemetry Ingestion</span>
+                    <small style="color:var(--text-muted); font-size:11px;">Profile: 3fa85f64</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Wallet Address Count <span class="val" id="val_wallet_count">2</span></label>
+                    <input type="range" id="wallet_count" min="0" max="5" value="2" oninput="updateVal('wallet_count')">
+                </div>
+
+                <div class="toggle-group">
+                    <span style="font-size:13px;">ILP Node Reachable</span>
+                    <label class="switch">
+                        <input type="checkbox" id="ilp_reachable" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-top:10px;">
+                    <label>Tx Success Rate (%) <span class="val" id="val_tx_success_rate">95%</span></label>
+                    <input type="range" id="tx_success_rate" min="0" max="100" value="95" oninput="updateVal('tx_success_rate', '%')">
+                </div>
+
+                <div class="form-group">
+                    <label>Connection Latency (ms) <span class="val" id="val_avg_connection_latency_ms">250ms</span></label>
+                    <input type="range" id="avg_connection_latency_ms" min="50" max="3000" value="250" oninput="updateVal('avg_connection_latency_ms', 'ms')">
+                </div>
+
+                <div class="form-group">
+                    <label>Fee to Volume Ratio (%) <span class="val" id="val_fee_to_volume_ratio">1%</span></label>
+                    <input type="range" id="fee_to_volume_ratio" min="0" max="20" value="1" step="0.5" oninput="updateVal('fee_to_volume_ratio', '%')">
+                </div>
+
+                <div class="form-group">
+                    <label>Cross-Asset Success (%) <span class="val" id="val_cross_asset_success_rate">90%</span></label>
+                    <input type="range" id="cross_asset_success_rate" min="0" max="100" value="90" oninput="updateVal('cross_asset_success_rate', '%')">
+                </div>
+
+                <div class="form-group">
+                    <label>Monthly Transactions <span class="val" id="val_tx_frequency_monthly">12</span></label>
+                    <input type="range" id="tx_frequency_monthly" min="0" max="100" value="12" oninput="updateVal('tx_frequency_monthly')">
+                </div>
+
+                <div class="form-group">
+                    <label>Reserve Liquidity (USD) <span class="val" id="val_reserve_liquidity_usd">$50</span></label>
+                    <input type="range" id="reserve_liquidity_usd" min="0" max="1000" value="50" oninput="updateVal('reserve_liquidity_usd', '$', true)">
+                </div>
+
+                <div class="toggle-group">
+                    <span style="font-size:13px;">Fallback Route Available</span>
+                    <label class="switch">
+                        <input type="checkbox" id="fallback_route_available" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button class="btn-primary" onclick="calculateFAI()">Calculate FAI Score</button>
             </div>
 
-            <div class="form-group">
-                <label>Wallet Address Count <span class="val" id="val_wallet_count">2</span></label>
-                <input type="range" id="wallet_count" min="0" max="5" value="2" oninput="updateVal('wallet_count')">
-            </div>
+            <!-- ML Smart Route Optimizer Panel -->
+            <div class="card">
+                <div class="card-title" style="color:var(--accent-blue);">
+                    <span>ML Smart Route Predictor</span>
+                    <small style="color:var(--text-muted); font-size:10px;">Interledger Liquidity</small>
+                </div>
 
-            <div class="toggle-group">
-                <span style="font-size:13px;">ILP Node Reachable</span>
-                <label class="switch">
-                    <input type="checkbox" id="ilp_reachable" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
+                <div class="form-group">
+                    <label>Source Asset</label>
+                    <select id="opt_src" class="model-select" style="width:100%;">
+                        <option value="USD">USD (US Dollar)</option>
+                        <option value="EUR">EUR (Euro)</option>
+                    </select>
+                </div>
 
-            <div class="form-group" style="margin-top:10px;">
-                <label>Tx Success Rate (%) <span class="val" id="val_tx_success_rate">95%</span></label>
-                <input type="range" id="tx_success_rate" min="0" max="100" value="95" oninput="updateVal('tx_success_rate', '%')">
-            </div>
+                <div class="form-group">
+                    <label>Destination Asset</label>
+                    <select id="opt_dest" class="model-select" style="width:100%;">
+                        <option value="EUR">EUR (Euro)</option>
+                        <option value="MXN">MXN (Mexican Peso)</option>
+                        <option value="KES">KES (Kenyan Shilling)</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label>Connection Latency (ms) <span class="val" id="val_avg_connection_latency_ms">250ms</span></label>
-                <input type="range" id="avg_connection_latency_ms" min="50" max="3000" value="250" oninput="updateVal('avg_connection_latency_ms', 'ms')">
-            </div>
+                <button class="btn-primary" style="background:linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)); margin-top:6px;" onclick="optimizeRoute()">Predict Optimal Route</button>
 
-            <div class="form-group">
-                <label>Fee to Volume Ratio (%) <span class="val" id="val_fee_to_volume_ratio">1%</span></label>
-                <input type="range" id="fee_to_volume_ratio" min="0" max="20" value="1" step="0.5" oninput="updateVal('fee_to_volume_ratio', '%')">
+                <div style="margin-top:14px;" id="opt_results_container">
+                    <div class="opt-grid">
+                        <div class="opt-box">
+                            <div class="opt-label">Predicted Fee</div>
+                            <div class="opt-val" id="opt_fee">0.2%</div>
+                        </div>
+                        <div class="opt-box">
+                            <div class="opt-label">Success Rate</div>
+                            <div class="opt-val" id="opt_prob" style="color:var(--accent-green);">99.5%</div>
+                        </div>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted);" id="opt_provider">Provider: ILP-Bridge-EU-Fast</div>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label>Cross-Asset Success (%) <span class="val" id="val_cross_asset_success_rate">90%</span></label>
-                <input type="range" id="cross_asset_success_rate" min="0" max="100" value="90" oninput="updateVal('cross_asset_success_rate', '%')">
-            </div>
-
-            <div class="form-group">
-                <label>Monthly Transactions <span class="val" id="val_tx_frequency_monthly">12</span></label>
-                <input type="range" id="tx_frequency_monthly" min="0" max="100" value="12" oninput="updateVal('tx_frequency_monthly')">
-            </div>
-
-            <div class="form-group">
-                <label>Reserve Liquidity (USD) <span class="val" id="val_reserve_liquidity_usd">$50</span></label>
-                <input type="range" id="reserve_liquidity_usd" min="0" max="1000" value="50" oninput="updateVal('reserve_liquidity_usd', '$', true)">
-            </div>
-
-            <div class="toggle-group">
-                <span style="font-size:13px;">Fallback Route Available</span>
-                <label class="switch">
-                    <input type="checkbox" id="fallback_route_available" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <button class="btn-primary" onclick="calculateFAI()">Run Multi-Model FAI Ingestion</button>
         </div>
 
         <!-- Dashboard Outputs -->
         <div>
-            <div class="card" style="margin-bottom: 24px;">
+            <div class="card">
                 <div class="card-title">
                     <span>Financial Access Index Snapshot</span>
                     <span id="active_methodology_badge" style="color:var(--accent-cyan); font-family:'JetBrains Mono'; font-size:12px;">GRADIENT_BOOSTING_ENSEMBLE</span>
@@ -502,7 +324,6 @@
                         </div>
                     </div>
 
-                    <!-- Radar Canvas -->
                     <div class="radar-container">
                         <canvas id="radarCanvas" width="260" height="180"></canvas>
                     </div>
@@ -529,8 +350,21 @@
         </div>
     </div>
 
+    <!-- Modal for Audit Report -->
+    <div class="modal-overlay" id="report_modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📄 Financial Access Audit Report</div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-main); white-space:pre-wrap;" id="report_content">Generating report...</div>
+        </div>
+    </div>
+
     <script>
         const profileId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
+        let latestFaiData = null;
+        let executedInterventions = [];
 
         function updateVal(id, unit = '', prefix = false) {
             const val = document.getElementById(id).value;
@@ -548,7 +382,6 @@
             const labels = Object.keys(scoresMap);
             const total = labels.length;
 
-            // Draw Web Grid
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.lineWidth = 1;
             for (let r = 1; r <= 3; r++) {
@@ -565,7 +398,6 @@
                 ctx.stroke();
             }
 
-            // Draw Data Polygon
             ctx.beginPath();
             ctx.fillStyle = 'rgba(0, 242, 254, 0.25)';
             ctx.strokeStyle = '#00f2fe';
@@ -617,8 +449,8 @@
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
+                latestFaiData = data;
 
-                // Update Score & Gauge
                 const score = data.overall_score;
                 document.getElementById('overall_score_val').innerText = score;
                 const offset = 440 - (440 * (score / 100));
@@ -627,10 +459,8 @@
 
                 log(`FAI Calculated: ${score}/100 (${data.scoring_version}). Diagnosed ${data.barriers.length} barriers.`);
 
-                // Draw Radar Chart
                 drawRadarChart(data.dimension_scores);
 
-                // Update Dimensions Cards
                 const dimContainer = document.getElementById('dimensions_container');
                 dimContainer.innerHTML = '';
                 for (const [dim, s] of Object.entries(data.dimension_scores)) {
@@ -648,7 +478,6 @@
                     `;
                 }
 
-                // Render Barriers
                 const barContainer = document.getElementById('barriers_container');
                 barContainer.innerHTML = '';
                 if (data.barriers.length === 0) {
@@ -697,9 +526,7 @@
                         </div>
                     `;
                 });
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function executeOpenPayment(interventionId) {
@@ -719,12 +546,11 @@
                     })
                 });
                 const data = await res.json();
+                executedInterventions.push({ intervention_id: interventionId, status: "COMPLETED", metadata: { estimated_savings_usd: 1.25 } });
                 con.innerText = `[${new Date().toLocaleTimeString()}] Open Payments Executed Successfully! Outgoing ID: ${data.open_payments_outgoing_id} (Fee: $${data.estimated_fee})\n` + con.innerText;
                 
-                // Simulate Post-Intervention FAI Delta jump
                 setTimeout(() => {
                     con.innerText = `[${new Date().toLocaleTimeString()}] Post-Intervention FAI Recalculated! Fee burden reduced by 35%. FAI Index boosted.\n` + con.innerText;
-                    // Lower fee ratio on slider to simulate improvement
                     document.getElementById('fee_to_volume_ratio').value = "0.5";
                     updateVal('fee_to_volume_ratio', '%');
                     calculateFAI();
@@ -735,8 +561,50 @@
             }
         }
 
-        // Run initial calculation
+        async function optimizeRoute() {
+            const src = document.getElementById('opt_src').value;
+            const dest = document.getElementById('opt_dest').value;
+
+            try {
+                const res = await fetch('/api/v1/routes/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ source_asset: src, destination_asset: dest, amount_usd: 100.0 })
+                });
+                const data = await res.json();
+                document.getElementById('opt_fee').innerText = data.predicted_fee_pct + '%';
+                document.getElementById('opt_prob').innerText = data.predicted_success_probability + '%';
+                document.getElementById('opt_provider').innerText = `Provider: ${data.liquidity_provider} (${data.estimated_settlement_ms}ms)`;
+
+                const con = document.getElementById('console_output');
+                con.innerText = `[${new Date().toLocaleTimeString()}] ML Predictive Route: ${data.recommended_action}\n` + con.innerText;
+            } catch (err) { console.error(err); }
+        }
+
+        async function exportAuditReport() {
+            if (!latestFaiData) return;
+
+            try {
+                const res = await fetch('/api/v1/reports/export', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        profile_id: profileId,
+                        fai_score_data: latestFaiData,
+                        interventions_executed: executedInterventions
+                    })
+                });
+                const data = await res.json();
+                document.getElementById('report_content').innerText = data.report_markdown;
+                document.getElementById('report_modal').style.display = 'flex';
+            } catch (err) { console.error(err); }
+        }
+
+        function closeModal() { document.getElementById('report_modal').style.display = 'none'; }
+
+        // Initial setup
         calculateFAI();
+        optimizeRoute();
     </script>
 </body>
 </html>

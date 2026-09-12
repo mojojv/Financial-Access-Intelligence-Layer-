@@ -16,6 +16,8 @@ from src.domain.barriers.barriers import Barrier, BarrierCode, BarrierSeverity
 from src.domain.access_index.dimensions import DimensionType
 from src.domain.interventions.interventions import InterventionEngine
 from src.integrations.open_payments.client import MockOpenPaymentsACLAdapter
+from src.infrastructure.ml.models.fee_optimizer import ILPLiquidityFeePredictor
+from src.application.access_index.exporter import FinancialAccessAuditReportExporter
 
 
 class FAIServerHandler(BaseHTTPRequestHandler):
@@ -124,7 +126,6 @@ class FAIServerHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(data).encode())
 
         elif parsed.path == "/api/v1/payments/execute":
-            # Execute mock payment directly
             data = {
                 "status": "SUCCESS",
                 "intervention_id": str(payload.get("intervention_id", uuid4())),
@@ -135,6 +136,26 @@ class FAIServerHandler(BaseHTTPRequestHandler):
             }
             self._set_headers(200, "application/json")
             self.wfile.write(json.dumps(data).encode())
+
+        elif parsed.path == "/api/v1/routes/optimize":
+            predictor = ILPLiquidityFeePredictor()
+            res = predictor.predict_optimal_route(
+                source_asset=payload.get("source_asset", "USD"),
+                destination_asset=payload.get("destination_asset", "EUR"),
+                amount_usd=float(payload.get("amount_usd", 100.0)),
+            )
+            self._set_headers(200, "application/json")
+            self.wfile.write(json.dumps(res.__dict__).encode())
+
+        elif parsed.path == "/api/v1/reports/export":
+            exporter = FinancialAccessAuditReportExporter()
+            res = exporter.generate_report(
+                profile_id=UUID(payload.get("profile_id", str(uuid4()))),
+                fai_score_data=payload.get("fai_score_data", {}),
+                interventions_executed=payload.get("interventions_executed", []),
+            )
+            self._set_headers(200, "application/json")
+            self.wfile.write(json.dumps(res).encode())
         else:
             self._set_headers(404, "application/json")
             self.wfile.write(json.dumps({"error": "Not Found"}).encode())
