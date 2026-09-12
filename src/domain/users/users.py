@@ -1,10 +1,19 @@
-"""Pseudonymous User and Financial Profile Domain Aggregates."""
+"""User and FinancialProfile Domain Aggregates."""
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from decimal import Decimal
+from typing import Any, Dict, List, Optional
 from uuid import UUID, uuid4
 
-from src.domain.shared.value_objects import WalletAddress
+from src.domain.access_index.dimensions import FinancialDimension, FinancialScore
+from src.domain.barriers.barriers import Barrier, BarrierCode, BarrierSeverity, BarrierState
+from src.domain.shared.events import (
+    BarrierDetected,
+    DomainEvent,
+    FinancialProfileCreated,
+    FinancialScoreCalculated,
+)
+from src.domain.shared.value_objects import DimensionKey, ProfileID, ScoreValue, WalletAddress
 
 
 @dataclass
@@ -27,16 +36,118 @@ class User:
 
 @dataclass
 class FinancialProfile:
-    """FinancialProfile aggregate storing pseudonymous indicators and telemetry vectors."""
-    profile_id: UUID
-    user_id: UUID
+    """Aggregate Root managing user financial access state, score history, barriers, and domain events."""
+    profile_id: ProfileID
     wallet_address: WalletAddress
     currency_code: str
     raw_features: Dict[str, Any]
+    latest_score: Optional[FinancialScore] = None
+    active_barriers: List[Barrier] = field(default_factory=list)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    _domain_events: List[DomainEvent] = field(default_factory=list, repr=False)
 
-    def update_features(self, new_features: Dict[str, Any]) -> None:
-        """Updates feature telemetry vector."""
-        self.raw_features.update(new_features)
-        self.updated_at = datetime.now(timezone.utc)
+    @classmethod
+    def create(cls, wallet_address: WalletAddress, currency_code: str = "USD") -> "FinancialProfile":
+        """Factory method to register a new pseudonymous Financial Profile."""
+        pid = ProfileID.generate()
+        profile = cls(
+            profile_id=pid,
+            wallet_address=wallet_address,
+            currency_code=currency_code,
+            raw_features={},
+        )
+        profile._record_event(
+            FinancialProfileCreated(
+                profile_id=pid.value,
+                wallet_address=wallet_address.url,
+                currency_code=currency_code,
+            )
+        )
+        return profile
+
+    @property
+    def domain_events(self) -> List[DomainEvent]:
+        """Returns collected uncommitted domain events."""
+        return list(self._domain_events)
+
+    def clear_domain_events(self) -> None:
+        """Clears collected domain events after dispatching."""
+        self._domain_events.clear()
+
+    def _record_event(self, event: DomainEvent) -> None:
+        """Internal helper to record domain events."""
+        self._domain_events.append(event)
+
+    def update_score(
+        self,
+        overall_score_val: float,
+        dimension_scores_map: Dict[DimensionKey, float],
+        methodology: str = "DETERMINISTIC_RULES",
+    ) -> FinancialScore:
+        """Recalculates the profile's FAI score and records FinancialScoreCalculated event."""
+        dim_entities: Dict[DimensionKey, FinancialDimension] = {}
+        for dim_key, s_val in dimension_scores_map.items():
+            dim_entities[dim_key] = FinancialDimension(
+                key=dim_key,
+                score=ScoreValue.from_float(s_val),
+            )
+
+        new_score = FinancialScore.create(
+            profile_id=self.profile_id.value,
+            overall_score=ScoreValue.from_float(overall_score_val),
+            dimensions=dim_entities,
+            scoring_version="v0.1-aggregate",
+            methodology=methodology,
+        )
+
+        self.latest_score = new_score
+
+        self._record_event(
+            FinancialScoreCalculated(
+                profile_id=self.profile_id.value,
+                score_id=new_score.score_id,
+                overall_score=new_score.overall_score.value,
+                scoring_version=new_score.scoring_version,
+                methodology=methodology,
+            )
+        )
+
+        return new_score
+
+    def record_barrier(
+        self,
+        barrier_code: BarrierCode,
+        dimension: DimensionKey,
+        severity: BarrierSeverity,
+        evidence: Dict[str, Any],
+    ) -> Barrier:
+        """Diagnoses and registers a structural barrier on the profile."""
+        if not self.latest_score:
+            snapshot_id = self.profile_id.value
+        else:
+            snapshot_id = self.latest_score.score_id
+
+        barrier = Barrier(
+            barrier_id=ProfileID.generate().value,
+            snapshot_id=snapshot_id,
+            profile_id=self.profile_id.value,
+            barrier_code=barrier_code,
+            dimension=dimension,
+            severity=severity,
+            evidence=evidence,
+            state=BarrierState.DIAGNOSED,
+        )
+
+        self.active_barriers.append(barrier)
+
+        self._record_event(
+            BarrierDetected(
+                profile_id=self.profile_id.value,
+                barrier_id=barrier.barrier_id,
+                barrier_code=barrier_code.value,
+                dimension=dimension.value,
+                severity=severity.value,
+            )
+        )
+
+        return barrier

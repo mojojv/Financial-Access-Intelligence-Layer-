@@ -1,4 +1,4 @@
-"""Intervention Domain Entities, Registry Pattern & Intervention Engine."""
+"""InterventionPlan Value Object, Strategies and Intervention Domain Entities."""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -29,9 +29,18 @@ class InterventionStatus(str, Enum):
     FAILED = "failed"
 
 
+@dataclass(frozen=True)
+class InterventionPlan:
+    """Immutable Value Object defining an action plan to resolve a barrier."""
+    action: InterventionType
+    routing_policy: str
+    target_metric_gain: float
+    description: str
+
+
 @dataclass
 class Intervention:
-    """Intervention entity representing an actionable response to a financial barrier."""
+    """Intervention entity managing intervention execution lifecycle."""
     intervention_id: UUID
     barrier_id: UUID
     profile_id: UUID
@@ -39,25 +48,21 @@ class Intervention:
     status: InterventionStatus
     metadata: Dict[str, Any]
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def transition_to(self, new_status: InterventionStatus) -> None:
-        """Enforces valid lifecycle state transitions."""
-        valid_transitions = {
+        """Enforces aggregate state transition invariants."""
+        allowed = {
             InterventionStatus.RECOMMENDED: [InterventionStatus.PENDING, InterventionStatus.FAILED],
             InterventionStatus.PENDING: [InterventionStatus.EXECUTING, InterventionStatus.FAILED],
             InterventionStatus.EXECUTING: [InterventionStatus.COMPLETED, InterventionStatus.FAILED],
             InterventionStatus.COMPLETED: [],
             InterventionStatus.FAILED: [],
         }
-
-        if new_status not in valid_transitions[self.status]:
+        if new_status not in allowed[self.status]:
             raise InvalidStateTransitionError(
-                f"Cannot transition Intervention from {self.status} to {new_status}."
+                f"Cannot transition Intervention from {self.status} to {new_status}"
             )
-
         self.status = new_status
-        self.updated_at = datetime.now(timezone.utc)
 
 
 @dataclass
@@ -146,6 +151,6 @@ class InterventionEngine:
             for strategy in self._strategies:
                 if strategy.can_handle(barrier):
                     interventions.append(strategy.recommend(barrier))
-                    break  # Select first matching strategy
+                    break
 
         return interventions

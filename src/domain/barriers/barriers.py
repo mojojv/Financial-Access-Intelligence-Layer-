@@ -1,49 +1,56 @@
-"""Financial Barrier Domain Entities and Detection Logic."""
+"""Barrier Entity and Severity Classifications."""
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List
 from uuid import UUID, uuid4
 
+from src.domain.shared.value_objects import BarrierCode, DimensionKey
 from src.domain.access_index.dimensions import DimensionType
-from src.domain.access_index.scoring import FAIScore
 
 
 class BarrierSeverity(str, Enum):
-    """Barrier severity classification."""
+    """Classification of barrier impact severity."""
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
 
 
-class BarrierCode(str, Enum):
-    """Catalog of detectable financial access barriers."""
-    HIGH_FEE_BURDEN = "BAR_AFF_01"              # Fee ratio > 2.5%
-    LOW_INTEROPERABILITY = "BAR_INT_02"         # Cross-asset failure > 30%
-    LOW_RESILIENCE = "BAR_RES_03"               # Liquidity reserve < 20
-    UNRELIABLE_CONNECTIVITY = "BAR_CON_04"      # Success rate < 70% or high latency
-    LIMITED_ACCESS = "BAR_ACC_05"               # No active wallet address reachability
-    LOW_USAGE = "BAR_USG_06"                    # Inactive wallet telemetry
+class BarrierState(str, Enum):
+    """Lifecycle state of a barrier."""
+    DIAGNOSED = "diagnosed"
+    MITIGATING = "mitigating"
+    RESOLVED = "resolved"
+    IGNORED = "ignored"
 
 
 @dataclass
 class Barrier:
-    """Barrier entity representing a diagnosed financial obstacle."""
+    """Barrier Entity representing a diagnosed financial obstacle."""
     barrier_id: UUID
     snapshot_id: UUID
     profile_id: UUID
     barrier_code: BarrierCode
-    dimension: DimensionType
+    dimension: DimensionKey
     severity: BarrierSeverity
     evidence: Dict[str, Any]
+    state: BarrierState = BarrierState.DIAGNOSED
     detected_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+
+    def resolve(self) -> None:
+        """Transitions barrier state to RESOLVED."""
+        self.state = BarrierState.RESOLVED
+
+    def start_mitigation(self) -> None:
+        """Transitions barrier state to MITIGATING."""
+        self.state = BarrierState.MITIGATING
 
 
 class BarrierDetectionService:
     """Domain Service that evaluates an FAI Score snapshot against rule specifications to detect barriers."""
 
-    def detect_barriers(self, fai_score: FAIScore) -> List[Barrier]:
+    def detect_barriers(self, fai_score: Any) -> List[Barrier]:
         barriers: List[Barrier] = []
 
         # 1. Evaluate Affordability

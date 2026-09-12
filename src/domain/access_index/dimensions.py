@@ -1,20 +1,12 @@
-"""Financial Access Index Dimension Definitions and Value Objects."""
-from dataclasses import dataclass
+"""Financial Access Index Score Entities and Aggregations."""
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from decimal import Decimal
-from enum import Enum
 from typing import Dict
+from uuid import UUID, uuid4
+
+from src.domain.shared.value_objects import DimensionKey, ScoreValue, DimensionType
 from src.domain.shared.exceptions import InvalidValueObjectError
-
-
-class DimensionType(str, Enum):
-    """The 7 Core Dimensions of the Financial Access Index."""
-    ACCESS = "access"
-    CONNECTIVITY = "connectivity"
-    AFFORDABILITY = "affordability"
-    RELIABILITY = "reliability"
-    INTEROPERABILITY = "interoperability"
-    USAGE = "usage"
-    RESILIENCE = "resilience"
 
 
 @dataclass(frozen=True)
@@ -50,7 +42,45 @@ class WeightVector:
         """Returns equal weights (1/7 for each dimension)."""
         equal_w = Decimal("1.0") / Decimal(len(DimensionType))
         weights = {dim: equal_w for dim in DimensionType}
-        # adjust small rounding residual on first dimension
         residual = Decimal("1.0") - sum(weights.values())
         weights[DimensionType.ACCESS] += residual
         return cls(weights=weights)
+
+
+@dataclass(frozen=True)
+class FinancialDimension:
+    """Immutable entity/value object representing an evaluated FAI dimension score."""
+    key: DimensionKey
+    score: ScoreValue
+    weight: Decimal = Decimal("0.1428")
+    confidence: Decimal = Decimal("1.00")
+
+
+@dataclass
+class FinancialScore:
+    """FinancialScore Entity encapsulating overall score and dimension breakdown."""
+    score_id: UUID
+    profile_id: UUID
+    overall_score: ScoreValue
+    dimensions: Dict[DimensionKey, FinancialDimension]
+    scoring_version: str
+    methodology: str
+    calculated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+
+    @classmethod
+    def create(
+        cls,
+        profile_id: UUID,
+        overall_score: ScoreValue,
+        dimensions: Dict[DimensionKey, FinancialDimension],
+        scoring_version: str,
+        methodology: str,
+    ) -> "FinancialScore":
+        return cls(
+            score_id=uuid4(),
+            profile_id=profile_id,
+            overall_score=overall_score,
+            dimensions=dimensions,
+            scoring_version=scoring_version,
+            methodology=methodology,
+        )
