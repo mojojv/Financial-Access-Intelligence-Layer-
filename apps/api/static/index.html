@@ -3,357 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Access Intelligence Layer (FAIL) — Command Center</title>
+    <title>Financial Access Intelligence Layer (FAIL) — Console</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #070a12;
-            --card-bg: rgba(15, 23, 42, 0.80);
+            /* Palette: Emerald / Indigo / Amber Warm Modern Slate */
+            --bg-dark: #0b0f19;
+            --bg-card: rgba(17, 24, 39, 0.85);
             --card-border: rgba(255, 255, 255, 0.08);
-            --accent-cyan: #00f2fe;
-            --accent-blue: #4facfe;
-            --accent-purple: #7f00ff;
-            --accent-green: #00e676;
-            --accent-red: #ff5252;
-            --accent-yellow: #ffd700;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --emerald-primary: #10b981;
+            --emerald-glow: rgba(16, 185, 129, 0.25);
+            --teal-light: #2dd4bf;
+            --indigo-accent: #6366f1;
+            --indigo-glow: rgba(99, 102, 241, 0.25);
+            --amber-warm: #f59e0b;
+            --rose-alert: #f43f5e;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
             background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh;
             background-image: 
-                radial-gradient(circle at 15% 15%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.12) 0%, transparent 45%);
+                radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(99, 102, 241, 0.10) 0%, transparent 40%);
             background-attachment: fixed; padding: 24px;
         }
 
-        .header {
-            display: flex; justify-content: space-between; align-items: center; max-width: 1440px; margin: 0 auto 28px auto;
-            padding-bottom: 20px; border-bottom: 1px solid var(--card-border);
+        .container { max-width: 1440px; margin: 0 auto; }
+
+        /* Navigation Header */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px;
+            border-bottom: 1px solid var(--card-border); margin-bottom: 24px;
         }
 
-        .header-title { display: flex; align-items: center; gap: 16px; }
-
-        .logo-icon {
-            width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 24px;
-            box-shadow: 0 0 24px rgba(0, 242, 254, 0.4);
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .brand-icon {
+            width: 46px; height: 46px; background: linear-gradient(135deg, var(--emerald-primary), var(--indigo-accent));
+            border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800;
+            font-size: 22px; color: #fff; box-shadow: 0 0 20px var(--emerald-glow);
         }
 
-        h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(90deg, #ffffff, var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { font-size: 13px; color: var(--text-muted); }
+        h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(90deg, #ffffff, var(--emerald-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 
-        .header-actions { display: flex; align-items: center; gap: 14px; }
+        .nav-tags { display: flex; align-items: center; gap: 10px; }
+        .tag-pill {
+            display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px;
+            font-size: 12px; font-weight: 600; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--card-border);
+        }
+        .tag-pill.active-emerald { border-color: var(--emerald-primary); color: var(--emerald-primary); background: rgba(16, 185, 129, 0.1); }
 
-        .model-select-wrapper {
-            display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.04); padding: 8px 14px;
-            border-radius: 14px; border: 1px solid var(--card-border);
+        /* Preset Buttons bar */
+        .preset-bar {
+            display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.03); padding: 12px 18px;
+            border-radius: 16px; border: 1px solid var(--card-border); margin-bottom: 24px; flex-wrap: wrap;
+        }
+        .preset-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); color: var(--text-main);
+            padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-preset:hover { background: var(--indigo-accent); color: #fff; border-color: var(--indigo-accent); transform: translateY(-1px); }
+
+        .model-select {
+            background: var(--bg-dark); color: var(--emerald-primary); border: 1px solid var(--emerald-primary);
+            border-radius: 10px; padding: 8px 12px; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; cursor: pointer; outline: none; margin-left: auto;
         }
 
-        .model-select-wrapper label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
-
-        select.model-select {
-            background: var(--bg-dark); color: var(--accent-cyan); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 8px;
-            padding: 6px 12px; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; outline: none; cursor: pointer;
-        }
-
-        .btn-report {
-            background: rgba(0, 242, 254, 0.1); border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
-            padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s;
-        }
-
-        .btn-report:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); }
-
-        .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; max-width: 1440px; margin: 0 auto; }
-
+        /* Layout Grid */
+        .main-grid { display: grid; grid-template-columns: 400px 1fr; gap: 24px; }
         @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
 
         .card {
-            background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--card-border);
-            border-radius: 20px; padding: 24px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); margin-bottom: 24px;
+            background: var(--bg-card); backdrop-filter: blur(16px); border: 1px solid var(--card-border);
+            border-radius: 20px; padding: 24px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4); margin-bottom: 24px; transition: border-color 0.3s;
+        }
+        .card:hover { border-color: rgba(16, 185, 129, 0.3); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .card-title { font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+
+        /* Form Sliders & Controls */
+        .control-group { margin-bottom: 14px; }
+        .control-label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        .control-val { color: var(--emerald-primary); font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+
+        input[type="range"] {
+            width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; outline: none; accent-color: var(--emerald-primary);
         }
 
-        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .toggle-row span { font-size: 13px; font-weight: 500; }
 
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
-        .form-group label span.val { color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
-
-        input[type="range"] { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; outline: none; accent-color: var(--accent-cyan); }
-
-        .toggle-group { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-
-        .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.15); transition: .3s; border-radius: 24px; }
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider { background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }
-        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider { background: linear-gradient(90deg, var(--emerald-primary), var(--teal-light)); }
+        input:checked + .slider:before { transform: translateX(18px); }
 
-        .btn-primary {
-            width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+        .btn-action {
+            width: 100%; padding: 14px; background: linear-gradient(135deg, var(--emerald-primary), var(--indigo-accent));
             border: none; border-radius: 12px; color: #ffffff; font-size: 14px; font-weight: 700; cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3); transition: all 0.3s ease; margin-top: 12px;
+            box-shadow: 0 4px 20px var(--emerald-glow); transition: all 0.3s ease; margin-top: 14px;
         }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--emerald-glow); }
 
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 242, 254, 0.5); }
-
-        .dashboard-hero {
+        /* Dashboard Hero Gauge & Radar */
+        .score-hero-container {
             display: grid; grid-template-columns: 220px 1fr; gap: 20px; background: rgba(0, 0, 0, 0.25);
-            border-radius: 16px; padding: 20px; margin-bottom: 24px; align-items: center;
+            border-radius: 16px; padding: 20px; margin-bottom: 24px; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05);
         }
+        @media (max-width: 768px) { .score-hero-container { grid-template-columns: 1fr; } }
 
-        @media (max-width: 768px) { .dashboard-hero { grid-template-columns: 1fr; } }
-
-        .score-gauge-wrap { position: relative; width: 160px; height: 160px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
-        .score-gauge-wrap svg { width: 160px; height: 160px; transform: rotate(-90deg); }
-        .score-gauge-wrap circle { fill: none; stroke-width: 12; stroke-linecap: round; }
+        .gauge-wrapper { position: relative; width: 160px; height: 160px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+        .gauge-wrapper svg { width: 160px; height: 160px; transform: rotate(-90deg); }
+        .gauge-wrapper circle { fill: none; stroke-width: 12; stroke-linecap: round; }
         .circle-bg { stroke: rgba(255, 255, 255, 0.08); }
-        .circle-fill { stroke: url(#scoreGradient); stroke-dasharray: 440; stroke-dashoffset: 440; transition: stroke-dashoffset 1s ease-in-out; }
-        .score-value { position: absolute; text-align: center; }
-        .score-num { font-size: 44px; font-weight: 800; font-family: 'JetBrains Mono', monospace; background: linear-gradient(90deg, #ffffff, var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .score-label { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; }
+        .circle-fill { stroke: url(#emeraldGradient); stroke-dasharray: 440; stroke-dashoffset: 440; transition: stroke-dashoffset 1s ease-in-out; }
 
-        .radar-container { display: flex; justify-content: center; align-items: center; height: 180px; }
+        .score-center-text { position: absolute; text-align: center; }
+        .score-number { font-size: 42px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #fff; }
+        .score-badge {
+            display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase;
+            background: rgba(16, 185, 129, 0.2); color: var(--emerald-primary); border: 1px solid var(--emerald-primary);
+        }
 
+        .radar-box { display: flex; justify-content: center; align-items: center; height: 180px; }
+
+        /* 7 Dimensions Cards */
         .dimensions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
-        .dim-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px; }
-        .dim-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: capitalize; }
-        .dim-score { font-size: 18px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--accent-cyan); margin-bottom: 6px; }
-        .bar-container { width: 100%; height: 5px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; }
-        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); width: 0%; transition: width 0.8s ease; }
+        .dim-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 14px; padding: 14px; }
+        .dim-name { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: capitalize; }
+        .dim-val { font-size: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--emerald-primary); margin-bottom: 8px; }
+        .progress-bg { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--emerald-primary), var(--teal-light)); width: 0%; transition: width 0.8s ease; }
 
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+        /* Barriers & Interventions */
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .two-column { grid-template-columns: 1fr; } }
 
-        .barrier-card { background: rgba(255, 82, 82, 0.08); border: 1px solid rgba(255, 82, 82, 0.3); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
-        .barrier-title { display: flex; justify-content: space-between; font-weight: 600; font-size: 13px; color: var(--accent-red); }
-        .barrier-sev { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(255, 82, 82, 0.2); text-transform: uppercase; }
+        .card-barrier { background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+        .barrier-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 13px; color: var(--rose-alert); }
+        .badge-sev { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(244, 63, 94, 0.2); text-transform: uppercase; }
 
-        .intervention-card { background: rgba(0, 230, 118, 0.08); border: 1px solid rgba(0, 230, 118, 0.3); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
-        .intervention-title { display: flex; justify-content: space-between; font-weight: 600; font-size: 13px; color: var(--accent-green); }
-        .btn-exec { background: var(--accent-green); color: #000; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+        .card-intervention { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+        .intervention-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 13px; color: var(--emerald-primary); }
+        .btn-execute { background: var(--emerald-primary); color: #000; border: none; padding: 8px 14px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; margin-top: 10px; transition: transform 0.2s; }
+        .btn-execute:hover { transform: scale(1.02); }
 
-        /* Optimizer Section */
-        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-        .opt-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 12px; }
-        .opt-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-        .opt-val { font-size: 14px; font-weight: 700; color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; }
+        /* Route Predictor */
+        .route-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .route-stat { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); padding: 12px; border-radius: 12px; }
+        .route-stat-label { font-size: 11px; color: var(--text-muted); }
+        .route-stat-val { font-size: 16px; font-weight: 800; color: var(--emerald-primary); font-family: 'JetBrains Mono', monospace; }
 
-        .console-output {
-            background: #040711; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px;
-            font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-cyan); max-height: 180px; overflow-y: auto; white-space: pre-wrap;
+        .log-terminal {
+            background: #060913; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 14px;
+            font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--teal-light); max-height: 180px; overflow-y: auto; white-space: pre-wrap; margin-top: 18px;
         }
 
-        /* Modal */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
-            display: none; align-items: center; justify-content: center; z-index: 999;
-        }
-
-        .modal-content {
-            background: #0b1120; border: 1px solid var(--accent-cyan); border-radius: 20px; width: 90%; max-width: 700px; padding: 28px;
-            max-height: 85vh; overflow-y: auto; box-shadow: 0 0 50px rgba(0, 242, 254, 0.3);
-        }
-
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 12px; }
-        .modal-title { font-size: 18px; font-weight: 700; color: var(--accent-cyan); }
-        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+        /* Report Modal */
+        .modal-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 999; }
+        .modal-box { background: #0f172a; border: 1px solid var(--emerald-primary); border-radius: 20px; width: 90%; max-width: 680px; padding: 28px; max-height: 85vh; overflow-y: auto; box-shadow: 0 0 50px var(--emerald-glow); }
+        .modal-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 12px; }
+        .modal-title { font-size: 18px; font-weight: 800; color: var(--emerald-primary); }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="header-title">
-            <div class="logo-icon">F</div>
+    <div class="container">
+        <!-- Header -->
+        <div class="navbar">
+            <div class="brand">
+                <div class="brand-icon">F</div>
+                <div>
+                    <h1>Financial Access Intelligence Console</h1>
+                    <div class="subtitle">Open Payments & Interledger Access Intelligence Infrastructure</div>
+                </div>
+            </div>
+
+            <div class="nav-tags">
+                <div class="tag-pill active-emerald">🟢 Server Live</div>
+                <div class="tag-pill">⚡ Open Payments ACL Active</div>
+                <div class="tag-pill">🛡️ Zero-PII Compliant</div>
+            </div>
+        </div>
+
+        <!-- 1-Click Profile Scenario Presets Bar -->
+        <div class="preset-bar">
+            <span class="preset-label">Test Real Scenarios:</span>
+            <button class="btn-preset" onclick="loadPreset('LOW_INCOME')">🔴 High Fee / Constrained User</button>
+            <button class="btn-preset" onclick="loadPreset('BALANCED')">🟢 Balanced Micro-Enterprise</button>
+            <button class="btn-preset" onclick="loadPreset('TRADER')">⚡ High Volume Merchant</button>
+
+            <select id="scoring_methodology" class="model-select" onchange="calculateFAI()">
+                <option value="DETERMINISTIC_RULES">v0.1 Deterministic Rules</option>
+                <option value="STATISTICAL_COHORT">v0.2 Statistical Cohort Z-Score</option>
+                <option value="ML_XGBOOST" selected>v0.3 Machine Learning XGBoost</option>
+                <option value="NON_LINEAR_MCDA">v0.4 Non-Linear MCDA Entropy</option>
+            </select>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-grid">
+            <!-- Sidebar Controls -->
             <div>
-                <h1>Financial Access Intelligence Command Center</h1>
-                <div class="subtitle">Multi-Model FAI Scoring Engine & Interledger Open Payments Smart Router</div>
+                <!-- Form Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">⚙️ Telemetry Vector Ingestion</div>
+                        <small style="color:var(--text-muted); font-size:11px;">Profile: 3fa85f64</small>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">Wallet Address Count <span class="control-val" id="val_wallet_count">2</span></div>
+                        <input type="range" id="wallet_count" min="0" max="5" value="2" oninput="updateVal('wallet_count')">
+                    </div>
+
+                    <div class="toggle-row">
+                        <span>ILP Node Reachable</span>
+                        <label class="switch">
+                            <input type="checkbox" id="ilp_reachable" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="control-group" style="margin-top:10px;">
+                        <div class="control-label">Transaction Success Rate <span class="control-val" id="val_tx_success_rate">95%</span></div>
+                        <input type="range" id="tx_success_rate" min="0" max="100" value="95" oninput="updateVal('tx_success_rate', '%')">
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">Connection Latency (ms) <span class="control-val" id="val_avg_connection_latency_ms">250ms</span></div>
+                        <input type="range" id="avg_connection_latency_ms" min="50" max="3000" value="250" oninput="updateVal('avg_connection_latency_ms', 'ms')">
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">Fee to Volume Ratio (%) <span class="control-val" id="val_fee_to_volume_ratio">1%</span></div>
+                        <input type="range" id="fee_to_volume_ratio" min="0" max="20" value="1" step="0.5" oninput="updateVal('fee_to_volume_ratio', '%')">
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">Cross-Asset Success (%) <span class="control-val" id="val_cross_asset_success_rate">90%</span></div>
+                        <input type="range" id="cross_asset_success_rate" min="0" max="100" value="90" oninput="updateVal('cross_asset_success_rate', '%')">
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">Monthly Transactions <span class="control-val" id="val_tx_frequency_monthly">12</span></div>
+                        <input type="range" id="tx_frequency_monthly" min="0" max="100" value="12" oninput="updateVal('tx_frequency_monthly')">
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">Reserve Liquidity (USD) <span class="control-val" id="val_reserve_liquidity_usd">$50</span></div>
+                        <input type="range" id="reserve_liquidity_usd" min="0" max="1000" value="50" oninput="updateVal('reserve_liquidity_usd', '$', true)">
+                    </div>
+
+                    <div class="toggle-row">
+                        <span>Fallback Route Available</span>
+                        <label class="switch">
+                            <input type="checkbox" id="fallback_route_available" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <button class="btn-action" onclick="calculateFAI()">Recalculate FAI Score</button>
+                </div>
+
+                <!-- ML Smart Route Optimizer Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">🛣️ Smart Route Predictor</div>
+                        <small style="color:var(--indigo-accent); font-size:11px; font-weight:700;">ML Optimizer</small>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">Source Asset</div>
+                        <select id="opt_src" class="model-select" style="width:100%;">
+                            <option value="USD">USD (US Dollar)</option>
+                            <option value="EUR">EUR (Euro)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">Destination Asset</div>
+                        <select id="opt_dest" class="model-select" style="width:100%;">
+                            <option value="EUR">EUR (Euro)</option>
+                            <option value="MXN">MXN (Mexican Peso)</option>
+                            <option value="KES">KES (Kenyan Shilling)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-action" style="background:linear-gradient(135deg, var(--indigo-accent), var(--teal-light)); margin-top:6px;" onclick="optimizeRoute()">Predict Low-Fee Route</button>
+
+                    <div style="margin-top:14px;">
+                        <div class="route-grid">
+                            <div class="route-stat">
+                                <div class="route-stat-label">Predicted Fee</div>
+                                <div class="route-stat-val" id="opt_fee">0.2%</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="route-stat-label">Success Prob</div>
+                                <div class="route-stat-val" id="opt_prob" style="color:var(--emerald-primary);">99.5%</div>
+                            </div>
+                        </div>
+                        <div style="font-size:11px; color:var(--text-muted);" id="opt_provider">Provider: ILP-Bridge-EU-Fast</div>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div class="header-actions">
-            <div class="model-select-wrapper">
-                <label>Model:</label>
-                <select id="scoring_methodology" class="model-select" onchange="calculateFAI()">
-                    <option value="DETERMINISTIC_RULES">v0.1 Deterministic Rules</option>
-                    <option value="STATISTICAL_COHORT">v0.2 Statistical Cohort Z-Score</option>
-                    <option value="ML_XGBOOST" selected>v0.3 Machine Learning XGBoost</option>
-                    <option value="NON_LINEAR_MCDA">v0.4 Non-Linear MCDA Entropy</option>
-                </select>
+
+            <!-- Right Dashboard Output Column -->
+            <div>
+                <!-- FAI Snapshot Hero Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📊 Financial Access Index Snapshot</div>
+                        <button class="btn-preset" style="background:rgba(16,185,129,0.15); border-color:var(--emerald-primary); color:var(--emerald-primary);" onclick="exportAuditReport()">Export Audit Report 📄</button>
+                    </div>
+
+                    <div class="score-hero-container">
+                        <div class="gauge-wrapper">
+                            <svg>
+                                <defs>
+                                    <linearGradient id="emeraldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#10b981"/>
+                                        <stop offset="100%" stop-color="#2dd4bf"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
+                                <circle class="circle-fill" id="score_circle" cx="80" cy="80" r="70"></circle>
+                            </svg>
+                            <div class="score-center-text">
+                                <div class="score-number" id="overall_score_val">0</div>
+                                <div class="score-badge" id="score_badge_status">HEALTHY</div>
+                            </div>
+                        </div>
+
+                        <!-- Radar Canvas -->
+                        <div class="radar-box">
+                            <canvas id="radarCanvas" width="260" height="180"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card-title" style="font-size:14px; margin-bottom:14px;">7 Dimensions Breakdown</div>
+                    <div class="dimensions-grid" id="dimensions_container"></div>
+                </div>
+
+                <!-- Barriers & Interventions -->
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title" style="color:var(--rose-alert);">🚨 Diagnosed Barriers</div>
+                        <div id="barriers_container"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title" style="color:var(--emerald-primary);">💡 Recommended Interventions</div>
+                        <div id="interventions_container"></div>
+                    </div>
+                </div>
+
+                <div class="log-terminal" id="console_output">System initialized. Ready for telemetry ingestion.</div>
             </div>
-            <button class="btn-report" onclick="exportAuditReport()">Export Audit Report 📄</button>
         </div>
     </div>
 
-    <div class="main-grid">
-        <!-- Sidebar Controls -->
-        <div>
-            <!-- Telemetry Form -->
-            <div class="card">
-                <div class="card-title">
-                    <span>Telemetry Ingestion</span>
-                    <small style="color:var(--text-muted); font-size:11px;">Profile: 3fa85f64</small>
-                </div>
-
-                <div class="form-group">
-                    <label>Wallet Address Count <span class="val" id="val_wallet_count">2</span></label>
-                    <input type="range" id="wallet_count" min="0" max="5" value="2" oninput="updateVal('wallet_count')">
-                </div>
-
-                <div class="toggle-group">
-                    <span style="font-size:13px;">ILP Node Reachable</span>
-                    <label class="switch">
-                        <input type="checkbox" id="ilp_reachable" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="form-group" style="margin-top:10px;">
-                    <label>Tx Success Rate (%) <span class="val" id="val_tx_success_rate">95%</span></label>
-                    <input type="range" id="tx_success_rate" min="0" max="100" value="95" oninput="updateVal('tx_success_rate', '%')">
-                </div>
-
-                <div class="form-group">
-                    <label>Connection Latency (ms) <span class="val" id="val_avg_connection_latency_ms">250ms</span></label>
-                    <input type="range" id="avg_connection_latency_ms" min="50" max="3000" value="250" oninput="updateVal('avg_connection_latency_ms', 'ms')">
-                </div>
-
-                <div class="form-group">
-                    <label>Fee to Volume Ratio (%) <span class="val" id="val_fee_to_volume_ratio">1%</span></label>
-                    <input type="range" id="fee_to_volume_ratio" min="0" max="20" value="1" step="0.5" oninput="updateVal('fee_to_volume_ratio', '%')">
-                </div>
-
-                <div class="form-group">
-                    <label>Cross-Asset Success (%) <span class="val" id="val_cross_asset_success_rate">90%</span></label>
-                    <input type="range" id="cross_asset_success_rate" min="0" max="100" value="90" oninput="updateVal('cross_asset_success_rate', '%')">
-                </div>
-
-                <div class="form-group">
-                    <label>Monthly Transactions <span class="val" id="val_tx_frequency_monthly">12</span></label>
-                    <input type="range" id="tx_frequency_monthly" min="0" max="100" value="12" oninput="updateVal('tx_frequency_monthly')">
-                </div>
-
-                <div class="form-group">
-                    <label>Reserve Liquidity (USD) <span class="val" id="val_reserve_liquidity_usd">$50</span></label>
-                    <input type="range" id="reserve_liquidity_usd" min="0" max="1000" value="50" oninput="updateVal('reserve_liquidity_usd', '$', true)">
-                </div>
-
-                <div class="toggle-group">
-                    <span style="font-size:13px;">Fallback Route Available</span>
-                    <label class="switch">
-                        <input type="checkbox" id="fallback_route_available" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <button class="btn-primary" onclick="calculateFAI()">Calculate FAI Score</button>
-            </div>
-
-            <!-- ML Smart Route Optimizer Panel -->
-            <div class="card">
-                <div class="card-title" style="color:var(--accent-blue);">
-                    <span>ML Smart Route Predictor</span>
-                    <small style="color:var(--text-muted); font-size:10px;">Interledger Liquidity</small>
-                </div>
-
-                <div class="form-group">
-                    <label>Source Asset</label>
-                    <select id="opt_src" class="model-select" style="width:100%;">
-                        <option value="USD">USD (US Dollar)</option>
-                        <option value="EUR">EUR (Euro)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Destination Asset</label>
-                    <select id="opt_dest" class="model-select" style="width:100%;">
-                        <option value="EUR">EUR (Euro)</option>
-                        <option value="MXN">MXN (Mexican Peso)</option>
-                        <option value="KES">KES (Kenyan Shilling)</option>
-                    </select>
-                </div>
-
-                <button class="btn-primary" style="background:linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)); margin-top:6px;" onclick="optimizeRoute()">Predict Optimal Route</button>
-
-                <div style="margin-top:14px;" id="opt_results_container">
-                    <div class="opt-grid">
-                        <div class="opt-box">
-                            <div class="opt-label">Predicted Fee</div>
-                            <div class="opt-val" id="opt_fee">0.2%</div>
-                        </div>
-                        <div class="opt-box">
-                            <div class="opt-label">Success Rate</div>
-                            <div class="opt-val" id="opt_prob" style="color:var(--accent-green);">99.5%</div>
-                        </div>
-                    </div>
-                    <div style="font-size:11px; color:var(--text-muted);" id="opt_provider">Provider: ILP-Bridge-EU-Fast</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dashboard Outputs -->
-        <div>
-            <div class="card">
-                <div class="card-title">
-                    <span>Financial Access Index Snapshot</span>
-                    <span id="active_methodology_badge" style="color:var(--accent-cyan); font-family:'JetBrains Mono'; font-size:12px;">GRADIENT_BOOSTING_ENSEMBLE</span>
-                </div>
-
-                <div class="dashboard-hero">
-                    <div class="score-gauge-wrap">
-                        <svg>
-                            <defs>
-                                <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stop-color="#4facfe"/>
-                                    <stop offset="100%" stop-color="#00f2fe"/>
-                                </linearGradient>
-                            </defs>
-                            <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
-                            <circle class="circle-fill" id="score_circle" cx="80" cy="80" r="70"></circle>
-                        </svg>
-                        <div class="score-value">
-                            <div class="score-num" id="overall_score_val">0</div>
-                            <div class="score-label">FAI SCORE</div>
-                        </div>
-                    </div>
-
-                    <div class="radar-container">
-                        <canvas id="radarCanvas" width="260" height="180"></canvas>
-                    </div>
-                </div>
-
-                <div class="card-title" style="font-size:14px;">7 Dimensions Matrix Breakdown</div>
-                <div class="dimensions-grid" id="dimensions_container"></div>
-            </div>
-
-            <!-- Barriers & Interventions -->
-            <div class="two-col">
-                <div class="card">
-                    <div class="card-title" style="color:var(--accent-red);">Diagnosed Barriers</div>
-                    <div id="barriers_container"></div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title" style="color:var(--accent-green);">Recommended Interventions</div>
-                    <div id="interventions_container"></div>
-                </div>
-            </div>
-
-            <div class="console-output" id="console_output">System initialized. Model registry ready.</div>
-        </div>
-    </div>
-
-    <!-- Modal for Audit Report -->
-    <div class="modal-overlay" id="report_modal">
-        <div class="modal-content">
-            <div class="modal-header">
+    <!-- Report Modal -->
+    <div class="modal-bg" id="report_modal">
+        <div class="modal-box">
+            <div class="modal-top">
                 <div class="modal-title">📄 Financial Access Audit Report</div>
                 <button class="modal-close" onclick="closeModal()">✕</button>
             </div>
@@ -369,6 +395,49 @@
         function updateVal(id, unit = '', prefix = false) {
             const val = document.getElementById(id).value;
             document.getElementById('val_' + id).innerText = prefix ? unit + val : val + unit;
+        }
+
+        function loadPreset(type) {
+            if (type === 'LOW_INCOME') {
+                document.getElementById('wallet_count').value = 1;
+                document.getElementById('ilp_reachable').checked = true;
+                document.getElementById('tx_success_rate').value = 70;
+                document.getElementById('avg_connection_latency_ms').value = 1200;
+                document.getElementById('fee_to_volume_ratio').value = 8.5;
+                document.getElementById('cross_asset_success_rate').value = 40;
+                document.getElementById('tx_frequency_monthly').value = 3;
+                document.getElementById('reserve_liquidity_usd').value = 10;
+                document.getElementById('fallback_route_available').checked = false;
+            } else if (type === 'BALANCED') {
+                document.getElementById('wallet_count').value = 2;
+                document.getElementById('ilp_reachable').checked = true;
+                document.getElementById('tx_success_rate').value = 95;
+                document.getElementById('avg_connection_latency_ms').value = 250;
+                document.getElementById('fee_to_volume_ratio').value = 1.0;
+                document.getElementById('cross_asset_success_rate').value = 90;
+                document.getElementById('tx_frequency_monthly').value = 15;
+                document.getElementById('reserve_liquidity_usd').value = 100;
+                document.getElementById('fallback_route_available').checked = true;
+            } else if (type === 'TRADER') {
+                document.getElementById('wallet_count').value = 4;
+                document.getElementById('ilp_reachable').checked = true;
+                document.getElementById('tx_success_rate').value = 99;
+                document.getElementById('avg_connection_latency_ms').value = 80;
+                document.getElementById('fee_to_volume_ratio').value = 0.2;
+                document.getElementById('cross_asset_success_rate').value = 98;
+                document.getElementById('tx_frequency_monthly').value = 60;
+                document.getElementById('reserve_liquidity_usd').value = 500;
+                document.getElementById('fallback_route_available').checked = true;
+            }
+
+            // Sync displays
+            ['wallet_count','tx_success_rate','avg_connection_latency_ms','fee_to_volume_ratio','cross_asset_success_rate','tx_frequency_monthly','reserve_liquidity_usd'].forEach(id => {
+                const u = id.includes('rate') || id.includes('ratio') ? '%' : (id.includes('latency') ? 'ms' : (id.includes('reserve') ? '$' : ''));
+                const p = id.includes('reserve');
+                updateVal(id, u, p);
+            });
+
+            calculateFAI();
         }
 
         function drawRadarChart(scoresMap) {
@@ -399,8 +468,8 @@
             }
 
             ctx.beginPath();
-            ctx.fillStyle = 'rgba(0, 242, 254, 0.25)';
-            ctx.strokeStyle = '#00f2fe';
+            ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
+            ctx.strokeStyle = '#10b981';
             ctx.lineWidth = 2;
 
             labels.forEach((dim, i) => {
@@ -455,9 +524,14 @@
                 document.getElementById('overall_score_val').innerText = score;
                 const offset = 440 - (440 * (score / 100));
                 document.getElementById('score_circle').style.strokeDashoffset = offset;
-                document.getElementById('active_methodology_badge').innerText = data.methodology;
 
-                log(`FAI Calculated: ${score}/100 (${data.scoring_version}). Diagnosed ${data.barriers.length} barriers.`);
+                // Status Badge
+                const badge = document.getElementById('score_badge_status');
+                if (score >= 75) { badge.innerText = "EXCELLENT"; badge.style.color = "var(--emerald-primary)"; }
+                else if (score >= 45) { badge.innerText = "MODERATE"; badge.style.color = "var(--amber-warm)"; }
+                else { badge.innerText = "CONSTRAINED"; badge.style.color = "var(--rose-alert)"; }
+
+                log(`FAI Score Calculated: ${score}/100. Diagnosed ${data.barriers.length} barriers.`);
 
                 drawRadarChart(data.dimension_scores);
 
@@ -465,14 +539,14 @@
                 dimContainer.innerHTML = '';
                 for (const [dim, s] of Object.entries(data.dimension_scores)) {
                     dimContainer.innerHTML += `
-                        <div class="dim-card">
-                            <div class="dim-header">
+                        <div class="dim-box">
+                            <div class="dim-name">
                                 <span>${dim}</span>
                                 <span>${s}/100</span>
                             </div>
-                            <div class="dim-score">${s}</div>
-                            <div class="bar-container">
-                                <div class="bar-fill" style="width: ${s}%;"></div>
+                            <div class="dim-val">${s}</div>
+                            <div class="progress-bg">
+                                <div class="progress-bar" style="width: ${s}%;"></div>
                             </div>
                         </div>
                     `;
@@ -481,15 +555,15 @@
                 const barContainer = document.getElementById('barriers_container');
                 barContainer.innerHTML = '';
                 if (data.barriers.length === 0) {
-                    barContainer.innerHTML = `<div style="font-size:12px; color:var(--accent-green);">No barriers detected. High financial inclusion!</div>`;
+                    barContainer.innerHTML = `<div style="font-size:12px; color:var(--emerald-primary);">No structural barriers diagnosed! High financial access.</div>`;
                     document.getElementById('interventions_container').innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No active recommendations needed.</div>`;
                 } else {
                     data.barriers.forEach(b => {
                         barContainer.innerHTML += `
-                            <div class="barrier-card">
-                                <div class="barrier-title">
+                            <div class="card-barrier">
+                                <div class="barrier-header">
                                     <span>${b.barrier_code} (${b.dimension})</span>
-                                    <span class="barrier-sev">${b.severity}</span>
+                                    <span class="badge-sev">${b.severity}</span>
                                 </div>
                             </div>
                         `;
@@ -497,9 +571,7 @@
                     fetchInterventions(data.barriers);
                 }
 
-            } catch (err) {
-                log("Error executing FAI score calculation: " + err.message);
-            }
+            } catch (err) { log("Error executing FAI calculation: " + err.message); }
         }
 
         async function fetchInterventions(barriers) {
@@ -516,13 +588,13 @@
 
                 data.interventions.forEach(i => {
                     intContainer.innerHTML += `
-                        <div class="intervention-card">
-                            <div class="intervention-title">
+                        <div class="card-intervention">
+                            <div class="intervention-header">
                                 <span>${i.intervention_type}</span>
                                 <span style="font-size:10px; text-transform:uppercase;">${i.status}</span>
                             </div>
                             <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">${i.metadata.description || 'Open Payments Intervention Routing'}</div>
-                            <button class="btn-exec" onclick="executeOpenPayment('${i.intervention_id}')">Execute via Open Payments</button>
+                            <button class="btn-execute" onclick="executeOpenPayment('${i.intervention_id}')">Execute via Open Payments</button>
                         </div>
                     `;
                 });
@@ -547,7 +619,7 @@
                 });
                 const data = await res.json();
                 executedInterventions.push({ intervention_id: interventionId, status: "COMPLETED", metadata: { estimated_savings_usd: 1.25 } });
-                con.innerText = `[${new Date().toLocaleTimeString()}] Open Payments Executed Successfully! Outgoing ID: ${data.open_payments_outgoing_id} (Fee: $${data.estimated_fee})\n` + con.innerText;
+                con.innerText = `[${new Date().toLocaleTimeString()}] Open Payments Settlement Successful! Outgoing ID: ${data.open_payments_outgoing_id} (Fee: $${data.estimated_fee})\n` + con.innerText;
                 
                 setTimeout(() => {
                     con.innerText = `[${new Date().toLocaleTimeString()}] Post-Intervention FAI Recalculated! Fee burden reduced by 35%. FAI Index boosted.\n` + con.innerText;
@@ -556,9 +628,7 @@
                     calculateFAI();
                 }, 1200);
 
-            } catch (err) {
-                con.innerText = `[${new Date().toLocaleTimeString()}] Payment Execution Error: ${err.message}\n` + con.innerText;
-            }
+            } catch (err) { con.innerText = `[${new Date().toLocaleTimeString()}] Payment Error: ${err.message}\n` + con.innerText; }
         }
 
         async function optimizeRoute() {
