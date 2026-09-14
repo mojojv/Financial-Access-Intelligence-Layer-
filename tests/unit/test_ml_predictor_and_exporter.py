@@ -1,7 +1,8 @@
 """Unit tests for ML Predictive Fee Predictor and Audit Exporter."""
 from uuid import uuid4
-from src.infrastructure.ml.models.fee_optimizer import ILPLiquidityFeePredictor
+
 from src.application.access_index.exporter import FinancialAccessAuditReportExporter
+from src.infrastructure.ml.models.fee_optimizer import ILPLiquidityFeePredictor
 
 
 def test_ilp_liquidity_fee_predictor() -> None:

@@ -9,7 +9,6 @@ from src.integrations.open_payments.client import OpenPaymentsACLClient
 from src.integrations.open_payments.mapper import OpenPaymentsMapper
 from tests.fixtures.open_payments_mocks import (
     mock_outgoing_payment_response,
-    mock_wallet_discovery_response,
 )
 
 

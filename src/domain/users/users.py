@@ -1,8 +1,7 @@
 """User and FinancialProfile Domain Aggregates."""
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID, uuid4
 
 from src.domain.access_index.dimensions import FinancialDimension, FinancialScore
@@ -22,7 +21,7 @@ class User:
     user_id: UUID
     consent_version: str
     status: str = "active"
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @classmethod
     def create_pseudonymous(cls, consent_version: str = "1.0") -> "User":
@@ -40,11 +39,11 @@ class FinancialProfile:
     profile_id: ProfileID
     wallet_address: WalletAddress
     currency_code: str
-    raw_features: Dict[str, Any]
-    latest_score: Optional[FinancialScore] = None
-    active_barriers: List[Barrier] = field(default_factory=list)
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    _domain_events: List[DomainEvent] = field(default_factory=list, repr=False)
+    raw_features: dict[str, Any]
+    latest_score: FinancialScore | None = None
+    active_barriers: list[Barrier] = field(default_factory=list)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    _domain_events: list[DomainEvent] = field(default_factory=list, repr=False)
 
     @classmethod
     def create(cls, wallet_address: WalletAddress, currency_code: str = "USD") -> "FinancialProfile":
@@ -66,7 +65,7 @@ class FinancialProfile:
         return profile
 
     @property
-    def domain_events(self) -> List[DomainEvent]:
+    def domain_events(self) -> list[DomainEvent]:
         """Returns collected uncommitted domain events."""
         return list(self._domain_events)
 
@@ -81,11 +80,11 @@ class FinancialProfile:
     def update_score(
         self,
         overall_score_val: float,
-        dimension_scores_map: Dict[DimensionKey, float],
+        dimension_scores_map: dict[DimensionKey, float],
         methodology: str = "DETERMINISTIC_RULES",
     ) -> FinancialScore:
         """Recalculates the profile's FAI score and records FinancialScoreCalculated event."""
-        dim_entities: Dict[DimensionKey, FinancialDimension] = {}
+        dim_entities: dict[DimensionKey, FinancialDimension] = {}
         for dim_key, s_val in dimension_scores_map.items():
             dim_entities[dim_key] = FinancialDimension(
                 key=dim_key,
@@ -119,7 +118,7 @@ class FinancialProfile:
         barrier_code: BarrierCode,
         dimension: DimensionKey,
         severity: BarrierSeverity,
-        evidence: Dict[str, Any],
+        evidence: dict[str, Any],
     ) -> Barrier:
         """Diagnoses and registers a structural barrier on the profile."""
         if not self.latest_score:

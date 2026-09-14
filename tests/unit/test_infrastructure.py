@@ -1,20 +1,16 @@
 """Tests for infrastructure layer: repositories, cache, and event bus."""
-import asyncio
-from decimal import Decimal
 from uuid import uuid4
 
 import pytest
 
+from src.domain.shared.events import BarrierDetected, FinancialScoreCalculated
 from src.infrastructure.cache.redis_adapter import RedisCacheAdapter
 from src.infrastructure.database.repositories import (
     BarrierRepository,
     FAIScoreRepository,
     FinancialProfileRepository,
-    InterventionRepository,
 )
 from src.infrastructure.events.event_bus import InMemoryEventBus
-from src.domain.shared.events import FinancialScoreCalculated, BarrierDetected
-
 
 # ---------------------------------------------------------------------------
 # RedisCacheAdapter Tests

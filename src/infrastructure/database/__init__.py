@@ -7,8 +7,8 @@ from src.infrastructure.database.repositories import (
 )
 
 __all__ = [
-    "FinancialProfileRepository",
-    "FAIScoreRepository",
     "BarrierRepository",
+    "FAIScoreRepository",
+    "FinancialProfileRepository",
     "InterventionRepository",
 ]

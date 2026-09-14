@@ -1,54 +1,65 @@
-FROM python:3.11-slim
-
-# Set metadata labels
-LABEL maintainer="Financial Access Intelligence Layer <fail@open-source.dev>"
-LABEL description="Financial Access Intelligence Layer — Open Payments / Interledger"
-LABEL version="0.1.0"
-
-# Security: run as non-root
-RUN groupadd --system appgroup && useradd --system --gid appgroup appuser
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    libpq-dev \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# ==============================================================================
+# Build Stage: Dependency Compilation and Virtual Environment Installation
+# ==============================================================================
+FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
-# Install Python dependencies first (better layer caching)
-COPY pyproject.toml ./
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir \
-    fastapi[standard]==0.115.0 \
-    uvicorn[standard]==0.30.6 \
-    httpx==0.27.0 \
-    pydantic==2.9.2 \
-    sqlalchemy[asyncio]==2.0.35 \
-    asyncpg==0.29.0 \
-    redis==5.1.0 \
-    structlog==24.4.0 \
-    prometheus-client==0.21.0 \
-    cryptography==43.0.1
+# Install build tools and uv package manager
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy source code
-COPY src/ ./src/
-COPY apps/ ./apps/
+# Install uv for high-speed dependency resolution
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-# Ensure src is importable
+# Copy dependency manifests
+COPY pyproject.toml README.md ./
+
+# Create virtual environment and install production dependencies
+RUN uv venv /app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+RUN uv pip install --no-cache-dir .
+
+# ==============================================================================
+# Final Stage: Production Runtime Image
+# ==============================================================================
+FROM python:3.12-slim AS runner
+
+LABEL maintainer="Financial Access Intelligence Team <fail@open-source.org>"
+LABEL description="Financial Access Intelligence Layer (FAIL) - Multi-Dimensional FAI Engine"
+LABEL version="0.1.0"
+
+# Security: Non-root user setup
+RUN groupadd --system appgroup && \
+    useradd --system --uid 10001 --gid appgroup appuser
+
+WORKDIR /app
+
+# Install minimal runtime system libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy installed virtual environment from builder stage
+COPY --from=builder /app/.venv /app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
 
-# Switch to non-root user
+# Copy application source code
+COPY src/ /app/src/
+COPY apps/ /app/apps/
+
+# Set file permissions for non-root appuser
 RUN chown -R appuser:appgroup /app
+
 USER appuser
 
-# Expose port
 EXPOSE 8000
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Run the FastAPI application
 CMD ["uvicorn", "apps.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

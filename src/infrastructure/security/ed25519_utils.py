@@ -11,19 +11,16 @@ References:
 """
 import base64
 import hashlib
-import hmac
 import json
 import time
-from typing import Dict, Optional, Tuple
 
 try:
+    from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric.ed25519 import (
         Ed25519PrivateKey,
-        Ed25519PublicKey,
     )
-    from cryptography.hazmat.primitives import serialization
 
-    def generate_ed25519_keypair() -> Tuple[bytes, bytes]:
+    def generate_ed25519_keypair() -> tuple[bytes, bytes]:
         """Generates a new Ed25519 keypair.
 
         Returns:
@@ -46,8 +43,8 @@ try:
         url: str,
         private_key_pem: bytes,
         key_id: str,
-        body_json: Optional[dict] = None,
-    ) -> Dict[str, str]:
+        body_json: dict | None = None,
+    ) -> dict[str, str]:
         """Creates RFC 9421-compliant HTTP Signature headers for GNAP requests.
 
         Args:
@@ -84,7 +81,7 @@ try:
         raw_signature = private_key.sign(signing_string.encode())
         encoded_sig = base64.b64encode(raw_signature).decode()
 
-        headers: Dict[str, str] = {
+        headers: dict[str, str] = {
             "Signature-Input": signature_input,
             "Signature": f"sig1=:{encoded_sig}:",
         }
@@ -97,7 +94,7 @@ try:
 
 except ImportError:
     # Fallback when cryptography library is not installed
-    def generate_ed25519_keypair() -> Tuple[bytes, bytes]:  # type: ignore
+    def generate_ed25519_keypair() -> tuple[bytes, bytes]:  # type: ignore
         """Returns placeholder keypair when cryptography library is unavailable."""
         placeholder = b"PLACEHOLDER_KEYPAIR_INSTALL_cryptography_PACKAGE"
         return placeholder, placeholder
@@ -107,8 +104,8 @@ except ImportError:
         url: str,
         private_key_pem: bytes,
         key_id: str,
-        body_json: Optional[dict] = None,
-    ) -> Dict[str, str]:
+        body_json: dict | None = None,
+    ) -> dict[str, str]:
         """Returns placeholder signature headers when cryptography is unavailable."""
         return {
             "Signature-Input": f'sig1=("@method" "@target-uri");created={int(time.time())};keyid="{key_id}"',

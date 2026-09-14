@@ -1,11 +1,11 @@
 """SQLAlchemy 2.0 async ORM models for Financial Access Intelligence Layer."""
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Optional
 from uuid import UUID, uuid4
 
 try:
     from sqlalchemy import (
+        JSON,
         Boolean,
         Column,
         DateTime,
@@ -14,14 +14,13 @@ try:
         ForeignKey,
         Index,
         Integer,
-        JSON,
         Numeric,
         String,
         Text,
     )
     from sqlalchemy.dialects.postgresql import UUID as PGUUID
-    from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
     from sqlalchemy.ext.asyncio import AsyncAttrs
+    from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
     class Base(AsyncAttrs, DeclarativeBase):
         """Declarative base for all ORM models."""
@@ -37,10 +36,10 @@ try:
         status: Mapped[str] = mapped_column(String(32), nullable=False, default="active")
         consent_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.0")
         created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                       default=lambda: datetime.now(timezone.utc))
+                                                       default=lambda: datetime.now(UTC))
         updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                       default=lambda: datetime.now(timezone.utc),
-                                                       onupdate=lambda: datetime.now(timezone.utc))
+                                                       default=lambda: datetime.now(UTC),
+                                                       onupdate=lambda: datetime.now(UTC))
 
         # Relationships
         scores: Mapped[list["FAIScoreORM"]] = relationship("FAIScoreORM", back_populates="profile",
@@ -62,7 +61,7 @@ try:
         methodology: Mapped[str] = mapped_column(String(64), nullable=False, default="DETERMINISTIC_RULES")
         scoring_version: Mapped[str] = mapped_column(String(32), nullable=False, default="v0.1")
         calculated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                          default=lambda: datetime.now(timezone.utc))
+                                                          default=lambda: datetime.now(UTC))
 
         # Relationship back-reference
         profile: Mapped["FinancialProfileORM"] = relationship("FinancialProfileORM", back_populates="scores")
@@ -85,8 +84,8 @@ try:
         state: Mapped[str] = mapped_column(String(32), nullable=False, default="DIAGNOSED")
         evidence: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
         diagnosed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                         default=lambda: datetime.now(timezone.utc))
-        resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+                                                         default=lambda: datetime.now(UTC))
+        resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
         profile: Mapped["FinancialProfileORM"] = relationship("FinancialProfileORM", back_populates="barriers")
 
@@ -101,8 +100,8 @@ try:
         status: Mapped[str] = mapped_column(String(32), nullable=False, default="PENDING")
         metadata_: Mapped[dict] = mapped_column("metadata", JSON, nullable=False, default=dict)
         created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                       default=lambda: datetime.now(timezone.utc))
-        executed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+                                                       default=lambda: datetime.now(UTC))
+        executed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
         __table_args__ = (
             Index("ix_intervention_profile", "profile_id"),
@@ -121,10 +120,10 @@ try:
         asset_code: Mapped[str] = mapped_column(String(10), nullable=False)
         debit_amount: Mapped[Decimal] = mapped_column(Numeric(20, 8), nullable=False)
         estimated_fee: Mapped[Decimal] = mapped_column(Numeric(20, 8), nullable=False, default=Decimal("0"))
-        outgoing_payment_id: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+        outgoing_payment_id: Mapped[str | None] = mapped_column(String(512), nullable=True)
         status: Mapped[str] = mapped_column(String(32), nullable=False, default="PENDING")
         executed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                        default=lambda: datetime.now(timezone.utc))
+                                                        default=lambda: datetime.now(UTC))
 
         __table_args__ = (
             Index("ix_payment_log_profile", "profile_id"),

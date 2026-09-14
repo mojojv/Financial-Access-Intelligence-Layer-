@@ -1,11 +1,11 @@
 """Unit tests for Barrier Detection logic."""
 from uuid import uuid4
-from src.domain.access_index.dimensions import DimensionType
+
 from src.domain.access_index.scoring import (
-    FeatureVector,
     DeterministicRuleScoringEngine,
+    FeatureVector,
 )
-from src.domain.barriers.barriers import BarrierDetectionService, BarrierCode
+from src.domain.barriers.barriers import BarrierCode, BarrierDetectionService
 
 
 def test_barrier_detection_high_fee_burden() -> None:

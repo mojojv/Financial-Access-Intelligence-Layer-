@@ -1,9 +1,7 @@
 """Non-Linear Multi-Criteria Decision Analysis (MCDA) Scoring Engine using Entropy Weighting."""
-from dataclasses import dataclass
-from decimal import Decimal
-from typing import Dict, Optional
-from uuid import UUID, uuid4
 import math
+from decimal import Decimal
+from uuid import UUID, uuid4
 
 from src.domain.access_index.dimensions import (
     DimensionScore,
@@ -24,10 +22,10 @@ class MCDAScoringEngine(IFAIScoringEngine):
         self,
         profile_id: UUID,
         features: FeatureVector,
-        weight_vector: Optional[WeightVector] = None,
+        weight_vector: WeightVector | None = None,
     ) -> FAIScore:
         weights = weight_vector or WeightVector.default_equal_weights()
-        dim_scores: Dict[DimensionType, DimensionScore] = {}
+        dim_scores: dict[DimensionType, DimensionScore] = {}
 
         # 1. Base Dimension Calculations
         raw_access = 100.0 if (features.ilp_reachable and features.wallet_count >= 2) else (50.0 if features.ilp_reachable else 20.0)

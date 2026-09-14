@@ -1,17 +1,17 @@
 """Shared Domain Module."""
 from src.domain.shared.exceptions import (
     DomainException,
-    InvalidValueObjectError,
     EntityNotFoundError,
     InvalidStateTransitionError,
+    InvalidValueObjectError,
 )
 from src.domain.shared.value_objects import Money, WalletAddress
 
 __all__ = [
     "DomainException",
-    "InvalidValueObjectError",
     "EntityNotFoundError",
     "InvalidStateTransitionError",
+    "InvalidValueObjectError",
     "Money",
     "WalletAddress",
 ]

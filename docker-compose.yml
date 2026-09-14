@@ -1,9 +1,9 @@
 version: "3.9"
 
 services:
-  # ─────────────────────────────────────────────────────────────────────────
-  # PostgreSQL 16 — Primary persistent store
-  # ─────────────────────────────────────────────────────────────────────────
+  # ---------------------------------------------------------------------------
+  # PostgreSQL 16 — Primary Relational Store
+  # ---------------------------------------------------------------------------
   postgres:
     image: postgres:16-alpine
     container_name: fail_postgres
@@ -23,9 +23,9 @@ services:
     networks:
       - fail_network
 
-  # ─────────────────────────────────────────────────────────────────────────
-  # Redis 7 — Cache & event streaming (optional, app degrades gracefully)
-  # ─────────────────────────────────────────────────────────────────────────
+  # ---------------------------------------------------------------------------
+  # Redis 7 — Cache & Event Streaming Broker
+  # ---------------------------------------------------------------------------
   redis:
     image: redis:7-alpine
     container_name: fail_redis
@@ -42,16 +42,14 @@ services:
     networks:
       - fail_network
 
-  # ─────────────────────────────────────────────────────────────────────────
-  # Financial Access Intelligence Layer API
-  # ─────────────────────────────────────────────────────────────────────────
+  # ---------------------------------------------------------------------------
+  # Financial Access Intelligence FastAPI Server
+  # ---------------------------------------------------------------------------
   api:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: fail_api
-    env_file:
-      - .env
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-fail_user}:${POSTGRES_PASSWORD:-fail_secret}@postgres:5432/${POSTGRES_DB:-fail_db}
       REDIS_URL: redis://redis:6379/0
@@ -66,56 +64,38 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
+      interval: 15s
+      timeout: 5s
       retries: 3
     networks:
       - fail_network
     restart: unless-stopped
 
-  # ─────────────────────────────────────────────────────────────────────────
-  # Prometheus — Metrics scraper
-  # ─────────────────────────────────────────────────────────────────────────
-  prometheus:
-    image: prom/prometheus:v2.51.0
-    container_name: fail_prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.retention.time=15d"
-    volumes:
-      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus
-    ports:
-      - "9090:9090"
-    networks:
-      - fail_network
-    depends_on:
-      - api
-
-  # ─────────────────────────────────────────────────────────────────────────
-  # Grafana — Observability dashboard
-  # ─────────────────────────────────────────────────────────────────────────
-  grafana:
-    image: grafana/grafana:10.4.0
-    container_name: fail_grafana
+  # ---------------------------------------------------------------------------
+  # Worker Service — Asynchronous Intervention & Telemetry Worker
+  # ---------------------------------------------------------------------------
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fail_worker
+    command: python -m apps.api.server
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
-      GF_USERS_ALLOW_SIGN_UP: "false"
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./infrastructure/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
-    ports:
-      - "3000:3000"
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-fail_user}:${POSTGRES_PASSWORD:-fail_secret}@postgres:5432/${POSTGRES_DB:-fail_db}
+      REDIS_URL: redis://redis:6379/0
+      ENVIRONMENT: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - fail_network
-    depends_on:
-      - prometheus
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
-  prometheus_data:
-  grafana_data:
 
 networks:
   fail_network:

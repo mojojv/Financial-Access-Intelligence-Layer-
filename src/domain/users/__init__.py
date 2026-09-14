@@ -1,4 +1,4 @@
 """Users Domain Package."""
-from src.domain.users.users import User, FinancialProfile
+from src.domain.users.users import FinancialProfile, User
 
-__all__ = ["User", "FinancialProfile"]
+__all__ = ["FinancialProfile", "User"]

@@ -1,8 +1,5 @@
 """Smart Open Payments Fee & Liquidity Risk Predictor Engine."""
 from dataclasses import dataclass
-from decimal import Decimal
-from typing import Dict, List, Tuple
-from uuid import UUID
 
 
 @dataclass(frozen=True)

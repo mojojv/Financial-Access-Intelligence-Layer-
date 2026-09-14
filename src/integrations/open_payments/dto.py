@@ -1,7 +1,6 @@
 """Open Payments Data Transfer Objects (DTOs) for Anti-Corruption Layer."""
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Optional
 
 
 @dataclass(frozen=True)

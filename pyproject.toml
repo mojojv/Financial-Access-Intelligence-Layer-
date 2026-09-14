@@ -52,6 +52,7 @@ markers = [
     "asyncio: mark test as an asyncio coroutine (auto-applied in asyncio_mode=auto)",
     "integration: mark test as requiring external services (postgres, redis)",
     "slow: mark test as slow-running",
+    "benchmark: mark test as a performance benchmark",
 ]
 
 [tool.ruff]

@@ -1,7 +1,6 @@
 """Redis Cache Adapter for FAI scores and Open Payments wallet resolution cache."""
 import json
-from datetime import timedelta
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID
 
 
@@ -23,7 +22,7 @@ class RedisCacheAdapter:
         self._memory_store: dict[str, str] = {}
         self._use_memory = redis_client is None
 
-    async def get(self, key: str) -> Optional[Any]:
+    async def get(self, key: str) -> Any | None:
         """Retrieves a value from cache by key.
 
         Args:

@@ -8,10 +8,9 @@ from __future__ import annotations
 
 import asyncio
 from collections import defaultdict
-from typing import Any, Awaitable, Callable, Dict, List, Type
+from collections.abc import Awaitable, Callable
 
 from src.domain.shared.events import DomainEvent
-
 
 # Handler type: an async callable that receives a DomainEvent
 EventHandler = Callable[[DomainEvent], Awaitable[None]]
@@ -32,9 +31,9 @@ class InMemoryEventBus:
     """
 
     def __init__(self) -> None:
-        self._handlers: Dict[str, List[EventHandler]] = defaultdict(list)
+        self._handlers: dict[str, list[EventHandler]] = defaultdict(list)
 
-    def subscribe(self, event_type: Type[DomainEvent]) -> Callable:
+    def subscribe(self, event_type: type[DomainEvent]) -> Callable:
         """Decorator to register an async handler for a given DomainEvent type.
 
         Args:
@@ -48,7 +47,7 @@ class InMemoryEventBus:
             return handler
         return decorator
 
-    def register(self, event_type: Type[DomainEvent], handler: EventHandler) -> None:
+    def register(self, event_type: type[DomainEvent], handler: EventHandler) -> None:
         """Programmatic handler registration (alternative to @subscribe decorator).
 
         Args:
@@ -69,7 +68,7 @@ class InMemoryEventBus:
         if handlers:
             await asyncio.gather(*[handler(event) for handler in handlers], return_exceptions=True)
 
-    async def publish_all(self, events: List[DomainEvent]) -> None:
+    async def publish_all(self, events: list[DomainEvent]) -> None:
         """Dispatches multiple domain events sequentially.
 
         Args:
@@ -78,7 +77,7 @@ class InMemoryEventBus:
         for event in events:
             await self.publish(event)
 
-    def handler_count(self, event_type: Type[DomainEvent]) -> int:
+    def handler_count(self, event_type: type[DomainEvent]) -> int:
         """Returns the number of registered handlers for a given event type.
 
         Args:

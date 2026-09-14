@@ -1,0 +1,57 @@
+site_name: Financial Access Intelligence Layer (FAIL) Documentation
+site_description: Academic research methodology, Open Payments integration guides, and architecture documentation for the multi-dimensional Financial Access Index (FAI).
+site_author: FAIL Open Source Maintainers
+site_url: https://fail-open.github.io/financial-access-intelligence/
+
+repo_name: fail-open/financial-access-intelligence
+repo_url: https://github.com/fail-open/financial-access-intelligence
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.def_fence_code
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Overview: index.md
+  - Research Methodology:
+      - Financial Access Index (FAI): methodology/fai-index.md
+  - Integration Guides:
+      - Open Payments Integration: guides/open-payments-integration.md
+  - Architecture ADRs:
+      - ADR 0001 - FAI Scoring Strategy: adrs/0001-fai-scoring-engine-architecture.md

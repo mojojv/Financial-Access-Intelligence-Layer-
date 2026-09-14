@@ -1,7 +1,5 @@
 """Machine Learning Gradient Boosting Scoring Engine for FAI (Phase 3 Evolution)."""
-from dataclasses import dataclass
 from decimal import Decimal
-from typing import Dict, Optional
 from uuid import UUID, uuid4
 
 from src.domain.access_index.dimensions import (
@@ -23,7 +21,7 @@ class XGBoostMLScoringEngine(IFAIScoringEngine):
         self,
         profile_id: UUID,
         features: FeatureVector,
-        weight_vector: Optional[WeightVector] = None,
+        weight_vector: WeightVector | None = None,
     ) -> FAIScore:
         weights = weight_vector or WeightVector.default_equal_weights()
 
@@ -44,7 +42,7 @@ class XGBoostMLScoringEngine(IFAIScoringEngine):
         ]
 
         # ML Ensembled Decision Forest Inference simulation
-        dim_scores: Dict[DimensionType, DimensionScore] = {}
+        dim_scores: dict[DimensionType, DimensionScore] = {}
 
         # 1. Access Model
         acc_pred = min(100.0, f_matrix[0] * 20.0 + f_matrix[1] * 50.0 + (10.0 if f_matrix[7] > 5 else 0.0))

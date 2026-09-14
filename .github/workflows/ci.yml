@@ -1,0 +1,43 @@
+name: CI Pipeline — Financial Access Intelligence Layer
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-lint:
+    name: Code Quality, Type Analysis & Coverage Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv Package Manager
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-suffix: "ubuntu-py312"
+
+      - name: Install Dependencies
+        run: |
+          uv pip install --system -e ".[dev,ml]"
+
+      - name: Code Quality Inspection (Ruff Linter)
+        run: |
+          ruff check .
+
+      - name: Static Type Analysis (Mypy)
+        run: |
+          mypy src
+
+      - name: Unit Tests & Code Coverage Enforcement (>80%)
+        run: |
+          pytest --cov=src --cov-report=term-missing --cov-fail-under=80

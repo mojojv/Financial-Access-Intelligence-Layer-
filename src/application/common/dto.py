@@ -1,7 +1,6 @@
 """Application Data Transfer Objects (DTOs)."""
 from dataclasses import dataclass
-from decimal import Decimal
-from typing import Any, Dict, List
+from typing import Any
 from uuid import UUID
 
 
@@ -28,7 +27,7 @@ class BarrierResponseDTO:
     barrier_code: str
     dimension: str
     severity: str
-    evidence: Dict[str, Any]
+    evidence: dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -36,8 +35,8 @@ class FAIScoreResponseDTO:
     score_id: UUID
     profile_id: UUID
     overall_score: float
-    dimension_scores: Dict[str, float]
-    barriers: List[BarrierResponseDTO]
+    dimension_scores: dict[str, float]
+    barriers: list[BarrierResponseDTO]
     scoring_version: str
     methodology: str
     calculated_at: str
@@ -50,4 +49,4 @@ class InterventionResponseDTO:
     profile_id: UUID
     intervention_type: str
     status: str
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]

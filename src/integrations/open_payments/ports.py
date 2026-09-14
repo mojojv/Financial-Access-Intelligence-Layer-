@@ -1,13 +1,13 @@
 """Domain Port Interfaces for Open Payments Anti-Corruption Layer (ACL)."""
 from abc import ABC, abstractmethod
 from decimal import Decimal
-from typing import Optional
+
 from src.integrations.open_payments.dto import (
-    WalletMetadataDTO,
     GNAPGrantDTO,
     IncomingPaymentDTO,
-    QuoteDTO,
     OutgoingPaymentDTO,
+    QuoteDTO,
+    WalletMetadataDTO,
 )
 
 

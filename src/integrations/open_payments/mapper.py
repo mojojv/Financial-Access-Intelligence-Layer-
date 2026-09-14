@@ -1,6 +1,6 @@
 """Open Payments Data Mappers (ACL Pure Mapping Functions)."""
 from decimal import Decimal
-from typing import Any, Dict
+from typing import Any
 
 from src.domain.payments.payment_intent import PaymentIntent, PaymentIntentStatus
 from src.domain.shared.value_objects import Money, WalletAddress
@@ -23,7 +23,7 @@ class OpenPaymentsMapper:
 
     @staticmethod
     def map_outgoing_payment_response(
-        response_json: Dict[str, Any],
+        response_json: dict[str, Any],
         sender_wallet: WalletAddress,
         receiver_wallet: WalletAddress,
     ) -> PaymentIntent:

@@ -1,23 +1,21 @@
 """Zero-Dependency Native HTTP Server for Financial Access Intelligence Layer."""
-import sys
-import os
-from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
+import os
+import sys
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
-from decimal import Decimal
 from uuid import UUID, uuid4
 
 # Ensure project root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
+from src.application.access_index.exporter import FinancialAccessAuditReportExporter
 from src.application.access_index.use_cases import CalculateFAIScoreUseCase
 from src.application.common.dto import CalculateFAIScoreRequestDTO
-from src.domain.barriers.barriers import Barrier, BarrierCode, BarrierSeverity
 from src.domain.access_index.dimensions import DimensionType
+from src.domain.barriers.barriers import Barrier, BarrierCode, BarrierSeverity
 from src.domain.interventions.interventions import InterventionEngine
-from src.integrations.open_payments.client import MockOpenPaymentsACLAdapter
 from src.infrastructure.ml.models.fee_optimizer import ILPLiquidityFeePredictor
-from src.application.access_index.exporter import FinancialAccessAuditReportExporter
 
 
 class FAIServerHandler(BaseHTTPRequestHandler):

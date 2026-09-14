@@ -3,10 +3,9 @@
 Exposes key operational metrics for monitoring FAI score calculations,
 Open Payments executions, barrier detections and API request volumes.
 """
-from typing import Optional
 
 try:
-    from prometheus_client import Counter, Gauge, Histogram, Summary, CollectorRegistry, REGISTRY
+    from prometheus_client import Counter, Gauge, Histogram, Summary
 
     # --- FAI Scoring Metrics ---
 

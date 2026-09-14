@@ -1,26 +1,26 @@
 """Unit tests for pure DDD Domain Layer (Value Objects, Entities, Aggregate Root, Events)."""
 from decimal import Decimal
-import pytest
 from uuid import UUID
 
-from src.domain.shared.exceptions import (
-    InvalidDimensionScoreError,
-    InvalidWalletAddressError,
-)
+import pytest
+
 from src.domain.barriers.barriers import (
     BarrierCode,
     BarrierSeverity,
 )
-from src.domain.shared.value_objects import (
-    DimensionKey,
-    ProfileID,
-    ScoreValue,
-    WalletAddress,
-)
 from src.domain.shared.events import (
+    BarrierDetected,
     FinancialProfileCreated,
     FinancialScoreCalculated,
-    BarrierDetected,
+)
+from src.domain.shared.exceptions import (
+    InvalidDimensionScoreError,
+    InvalidWalletAddressError,
+)
+from src.domain.shared.value_objects import (
+    DimensionKey,
+    ScoreValue,
+    WalletAddress,
 )
 from src.domain.users.users import FinancialProfile
 

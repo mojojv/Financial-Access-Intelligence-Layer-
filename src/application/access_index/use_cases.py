@@ -1,18 +1,20 @@
-"""Use Cases for Financial Access Index Calculation and Barrier Diagnosis."""
+from typing import Any
+from uuid import UUID
+
 from src.application.common.dto import (
+    BarrierResponseDTO,
     CalculateFAIScoreRequestDTO,
     FAIScoreResponseDTO,
-    BarrierResponseDTO,
 )
 from src.domain.access_index.scoring import (
+    DeterministicRuleScoringEngine,
     FeatureVector,
     IFAIScoringEngine,
-    DeterministicRuleScoringEngine,
 )
 from src.domain.barriers.barriers import BarrierDetectionService
+from src.infrastructure.ml.scoring.mcda import MCDAScoringEngine
 from src.infrastructure.ml.scoring.statistical import StatisticalScoringEngine
 from src.infrastructure.ml.scoring.xgboost_engine import XGBoostMLScoringEngine
-from src.infrastructure.ml.scoring.mcda import MCDAScoringEngine
 
 
 class CalculateFAIScoreUseCase:
@@ -20,8 +22,8 @@ class CalculateFAIScoreUseCase:
 
     def __init__(
         self,
-        scoring_engine: IFAIScoringEngine = None,
-        barrier_detector: BarrierDetectionService = None,
+        scoring_engine: IFAIScoringEngine | None = None,
+        barrier_detector: BarrierDetectionService | None = None,
     ) -> None:
         self.default_scoring_engine = scoring_engine or DeterministicRuleScoringEngine()
         self.barrier_detector = barrier_detector or BarrierDetectionService()
@@ -87,3 +89,24 @@ class CalculateFAIScoreUseCase:
             methodology=fai_score.methodology,
             calculated_at=fai_score.calculated_at.isoformat(),
         )
+
+
+class ExportAuditReportUseCase:
+    """Use Case for generating and exporting Financial Access Audit Reports."""
+
+    def __init__(self) -> None:
+        from src.application.access_index.exporter import FinancialAccessAuditReportExporter
+        self.exporter = FinancialAccessAuditReportExporter()
+
+    def execute(
+        self,
+        profile_id: UUID,
+        fai_score_data: dict[str, Any],
+        interventions_executed: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        return self.exporter.generate_report(
+            profile_id=profile_id,
+            fai_score_data=fai_score_data,
+            interventions_executed=interventions_executed,
+        )
+

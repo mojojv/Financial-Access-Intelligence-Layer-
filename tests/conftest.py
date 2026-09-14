@@ -1,7 +1,6 @@
 """Pytest configuration and shared fixtures for Financial Access Intelligence Layer tests."""
 import asyncio
 from decimal import Decimal
-from typing import AsyncGenerator, Generator
 from uuid import uuid4
 
 import pytest
@@ -9,16 +8,15 @@ import pytest
 from src.domain.access_index.dimensions import DimensionType, WeightVector
 from src.domain.access_index.scoring import FeatureVector
 from src.domain.barriers.barriers import Barrier, BarrierCode, BarrierSeverity, BarrierState
-from src.domain.shared.value_objects import Money, ProfileID, ScoreValue, WalletAddress
+from src.domain.shared.value_objects import Money, ProfileID, WalletAddress
 from src.infrastructure.cache.redis_adapter import RedisCacheAdapter
-from src.infrastructure.events.event_bus import InMemoryEventBus
 from src.infrastructure.database.repositories import (
     BarrierRepository,
     FAIScoreRepository,
     FinancialProfileRepository,
     InterventionRepository,
 )
-
+from src.infrastructure.events.event_bus import InMemoryEventBus
 
 # ---------------------------------------------------------------------------
 # Event loop configuration

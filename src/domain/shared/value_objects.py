@@ -7,8 +7,8 @@ from uuid import UUID, uuid4
 
 from src.domain.shared.exceptions import (
     InvalidDimensionScoreError,
-    InvalidWalletAddressError,
     InvalidValueObjectError,
+    InvalidWalletAddressError,
 )
 
 
@@ -111,3 +111,4 @@ class BarrierCode(str, Enum):
     UNRELIABLE_CONNECTIVITY = "BAR_CON_04"      # High latency or packet drop constraint
     LIMITED_ACCESS = "BAR_ACC_05"               # Wallet unreachability constraint
     LOW_USAGE = "BAR_USG_06"                    # Inactive telemetry constraint
+    UNRELIABLE_SETTLEMENT = "BAR_REL_07"        # Settlement fulfillment constraint

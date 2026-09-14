@@ -1,9 +1,8 @@
 """Statistical Cohort Scoring Engine Implementation for FAI (Phase 2 Evolution)."""
+import math
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Dict, Optional
 from uuid import UUID, uuid4
-import math
 
 from src.domain.access_index.dimensions import (
     DimensionScore,
@@ -27,7 +26,7 @@ class CohortBenchmark:
 class StatisticalScoringEngine(IFAIScoringEngine):
     """Statistical FAI Scoring Engine using Z-score normalization against cohort benchmarks."""
 
-    def __init__(self, benchmarks: Optional[Dict[DimensionType, CohortBenchmark]] = None) -> None:
+    def __init__(self, benchmarks: dict[DimensionType, CohortBenchmark] | None = None) -> None:
         # Default global cohort benchmarks
         self._benchmarks = benchmarks or {
             DimensionType.ACCESS: CohortBenchmark(mean=50.0, std_dev=20.0),
@@ -55,10 +54,10 @@ class StatisticalScoringEngine(IFAIScoringEngine):
         self,
         profile_id: UUID,
         features: FeatureVector,
-        weight_vector: Optional[WeightVector] = None,
+        weight_vector: WeightVector | None = None,
     ) -> FAIScore:
         weights = weight_vector or WeightVector.default_equal_weights()
-        dim_scores: Dict[DimensionType, DimensionScore] = {}
+        dim_scores: dict[DimensionType, DimensionScore] = {}
 
         # Raw dimension values
         raw_access = float(features.wallet_count * 25 + (50 if features.ilp_reachable else 0))

@@ -4,8 +4,8 @@ from uuid import uuid4
 
 import pytest
 
-from src.integrations.open_payments.client import MockOpenPaymentsACLAdapter
 from src.domain.shared.value_objects import Money, WalletAddress
+from src.integrations.open_payments.client import MockOpenPaymentsACLAdapter
 
 
 @pytest.mark.asyncio

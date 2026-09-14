@@ -1,10 +1,10 @@
 """InterventionPlan Value Object, Strategies and Intervention Domain Entities."""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID, uuid4
 
 from src.domain.barriers.barriers import Barrier, BarrierCode
@@ -46,8 +46,8 @@ class Intervention:
     profile_id: UUID
     intervention_type: InterventionType
     status: InterventionStatus
-    metadata: Dict[str, Any]
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    metadata: dict[str, Any]
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def transition_to(self, new_status: InterventionStatus) -> None:
         """Enforces aggregate state transition invariants."""
@@ -74,7 +74,7 @@ class InterventionOutcome:
     post_fai_score: Decimal
     score_delta: Decimal
     cost_saved_usd: Decimal
-    evaluated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    evaluated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class IInterventionStrategy(ABC):
@@ -135,8 +135,8 @@ class CrossAssetBridgeStrategy(IInterventionStrategy):
 class InterventionEngine:
     """Intervention Engine orchestrator using dynamic strategy registry."""
 
-    def __init__(self, strategies: Optional[List[IInterventionStrategy]] = None) -> None:
-        self._strategies: List[IInterventionStrategy] = strategies or [
+    def __init__(self, strategies: list[IInterventionStrategy] | None = None) -> None:
+        self._strategies: list[IInterventionStrategy] = strategies or [
             FeeOptimizedRouteStrategy(),
             CrossAssetBridgeStrategy(),
         ]
@@ -144,8 +144,8 @@ class InterventionEngine:
     def register_strategy(self, strategy: IInterventionStrategy) -> None:
         self._strategies.append(strategy)
 
-    def recommend_interventions(self, barriers: List[Barrier]) -> List[Intervention]:
-        interventions: List[Intervention] = []
+    def recommend_interventions(self, barriers: list[Barrier]) -> list[Intervention]:
+        interventions: list[Intervention] = []
 
         for barrier in barriers:
             for strategy in self._strategies:

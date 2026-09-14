@@ -1,8 +1,8 @@
 """Open Payments Fixtures and Mock Response Generators for Offline Unit & ACL Testing."""
-from typing import Any, Dict
+from typing import Any
 
 
-def mock_wallet_discovery_response(wallet_url: str = "https://ilp.wallet.com/alice") -> Dict[str, Any]:
+def mock_wallet_discovery_response(wallet_url: str = "https://ilp.wallet.com/alice") -> dict[str, Any]:
     """Generates mock Open Payments wallet address metadata JSON response."""
     return {
         "id": wallet_url,
@@ -17,7 +17,7 @@ def mock_incoming_payment_response(
     wallet_url: str = "https://ilp.wallet.com/bob",
     incoming_id: str = "inc-pay-123",
     amount_str: str = "5000",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Generates mock Open Payments incoming payment JSON response."""
     return {
         "id": f"{wallet_url}/incoming-payments/{incoming_id}",
@@ -30,7 +30,7 @@ def mock_incoming_payment_response(
 def mock_quote_response(
     sender_wallet: str = "https://ilp.wallet.com/alice",
     receiver_incoming_url: str = "https://ilp.wallet.com/bob/incoming-payments/inc-pay-123",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Generates mock Open Payments quote JSON response."""
     return {
         "id": f"{sender_wallet}/quotes/quote-789",
@@ -44,7 +44,7 @@ def mock_quote_response(
 def mock_outgoing_payment_response(
     sender_wallet: str = "https://ilp.wallet.com/alice",
     quote_url: str = "https://ilp.wallet.com/alice/quotes/quote-789",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Generates mock Open Payments outgoing payment JSON response."""
     return {
         "id": f"{sender_wallet}/outgoing-payments/out-456",

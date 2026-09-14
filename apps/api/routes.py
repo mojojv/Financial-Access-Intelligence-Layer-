@@ -1,45 +1,86 @@
-"""FastAPI API Routes for Financial Access Intelligence Layer with Graceful Fallbacks."""
+"""FastAPI API Routes for Financial Access Intelligence Layer with Strict Dependency Injection."""
 from decimal import Decimal
-from typing import Any, Dict, List
+from typing import Any, Literal
 from uuid import UUID, uuid4
 
-try:
-    from fastapi import APIRouter, HTTPException, status
-    from pydantic import BaseModel, Field
-except ImportError:
-    # Graceful fallback types for bare Python test environments prior to pip install
-    class APIRouter:
-        def get(self, *args: Any, **kwargs: Any) -> Any:
-            def decorator(f: Any) -> Any: return f
-            return decorator
-        def post(self, *args: Any, **kwargs: Any) -> Any:
-            def decorator(f: Any) -> Any: return f
-            return decorator
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-    class BaseModel:
-        def __init__(self, **data: Any) -> None:
-            for k, v in data.items():
-                setattr(self, k, v)
-
-    def Field(default: Any = None, **kwargs: Any) -> Any:
-        return default
-
-from src.application.access_index.use_cases import CalculateFAIScoreUseCase
+from src.application.access_index.use_cases import (
+    CalculateFAIScoreUseCase,
+    ExportAuditReportUseCase,
+)
 from src.application.common.dto import CalculateFAIScoreRequestDTO
-from src.domain.barriers.barriers import Barrier, BarrierCode, BarrierSeverity
-from src.domain.access_index.dimensions import DimensionType
-from src.domain.interventions.interventions import InterventionEngine
-from src.integrations.open_payments.client import MockOpenPaymentsACLAdapter
-from src.infrastructure.ml.models.fee_optimizer import ILPLiquidityFeePredictor
-from src.application.access_index.exporter import FinancialAccessAuditReportExporter
+from src.application.interventions.use_cases import RecommendInterventionsUseCase
+from src.application.payments.use_cases import (
+    ExecuteInterventionPaymentUseCase,
+    OptimizeRouteUseCase,
+)
 
 router = APIRouter()
 
 
-class FeatureIngestionSchema(BaseModel):
+# ---------------------------------------------------------------------------
+# Dependency Provider Factories for FastAPI DI
+# ---------------------------------------------------------------------------
+
+
+def get_calculate_fai_score_use_case() -> CalculateFAIScoreUseCase:
+    return CalculateFAIScoreUseCase()
+
+
+def get_recommend_interventions_use_case() -> RecommendInterventionsUseCase:
+    return RecommendInterventionsUseCase()
+
+
+def get_execute_intervention_payment_use_case() -> ExecuteInterventionPaymentUseCase:
+    return ExecuteInterventionPaymentUseCase()
+
+
+def get_optimize_route_use_case() -> OptimizeRouteUseCase:
+    return OptimizeRouteUseCase()
+
+
+def get_export_audit_report_use_case() -> ExportAuditReportUseCase:
+    return ExportAuditReportUseCase()
+
+
+def _resolve_dep(dep_arg: Any, factory: Any) -> Any:
+    """Resolves dependency if invoked directly in unit tests without FastAPI DI context."""
+    if dep_arg is None or hasattr(dep_arg, "dependency"):
+        return factory()
+    return dep_arg
+
+
+# ---------------------------------------------------------------------------
+# Base Schema Configuration
+# ---------------------------------------------------------------------------
+
+
+class StrictSchema(BaseModel):
+    """Base Pydantic v2 Schema with dict subscription support for testing compatibility."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    def __getitem__(self, item: str) -> Any:
+        return getattr(self, item)
+
+    def __contains__(self, key: object) -> bool:
+        return hasattr(self, str(key))
+
+    def __iter__(self) -> Any:
+        return iter(self.model_dump())
+
+
+# ---------------------------------------------------------------------------
+# Input Schemas (DTOs)
+# ---------------------------------------------------------------------------
+
+
+class FeatureIngestionRequest(StrictSchema):
     profile_id: UUID
     wallet_count: int = Field(default=1, ge=0)
-    ilp_reachable: bool = Field(default=True)
+    ilp_reachable: bool = True
     tx_success_rate: float = Field(default=0.95, ge=0.0, le=1.0)
     avg_connection_latency_ms: float = Field(default=250.0, ge=0.0)
     fee_to_volume_ratio: float = Field(default=0.01, ge=0.0)
@@ -48,41 +89,154 @@ class FeatureIngestionSchema(BaseModel):
     tx_frequency_monthly: int = Field(default=12, ge=0)
     tx_volume_monthly_usd: float = Field(default=250.0, ge=0.0)
     reserve_liquidity_usd: float = Field(default=50.0, ge=0.0)
-    fallback_route_available: bool = Field(default=True)
-    methodology: str = Field(default="DETERMINISTIC_RULES")
+    fallback_route_available: bool = True
+    methodology: Literal[
+        "DETERMINISTIC_RULES",
+        "STATISTICAL_COHORT",
+        "ML_XGBOOST",
+        "NON_LINEAR_MCDA",
+    ] = "DETERMINISTIC_RULES"
 
 
-class ExecuteInterventionRequestSchema(BaseModel):
+# Alias for backward compatibility with unit tests
+FeatureIngestionSchema = FeatureIngestionRequest
+
+
+class BarrierRequest(StrictSchema):
+    barrier_id: UUID = Field(default_factory=uuid4)
+    profile_id: UUID = Field(default_factory=uuid4)
+    barrier_code: str = Field(min_length=1, max_length=64)
+    dimension: str = Field(min_length=1, max_length=64)
+    severity: str = Field(min_length=1, max_length=32)
+    evidence: dict[str, Any] = Field(default_factory=dict)
+
+
+class ExecutePaymentRequest(StrictSchema):
     intervention_id: UUID
-    sender_wallet: str
-    receiver_wallet: str
-    amount: float = Field(gt=0)
-    asset_code: str = Field(default="USD")
+    sender_wallet: str = Field(min_length=1, max_length=512)
+    receiver_wallet: str = Field(min_length=1, max_length=512)
+    amount: Decimal = Field(gt=Decimal("0"), max_digits=20, decimal_places=8)
+    asset_code: str = Field(default="USD", min_length=3, max_length=10)
+    idempotency_key: str = Field(default_factory=lambda: str(uuid4()))
+
+    @field_validator("amount", mode="before")
+    @classmethod
+    def convert_amount_to_decimal(cls, value: object) -> object:
+        if isinstance(value, (float, int, str)):
+            return Decimal(str(value))
+        return value
 
 
-class RouteOptimizationRequestSchema(BaseModel):
-    source_asset: str = Field(default="USD")
-    destination_asset: str = Field(default="EUR")
-    amount_usd: float = Field(default=100.0, gt=0)
+# Alias for backward compatibility with unit tests
+ExecuteInterventionRequestSchema = ExecutePaymentRequest
 
 
-class ReportExportRequestSchema(BaseModel):
+class RouteOptimizationRequest(StrictSchema):
+    source_asset: str = Field(default="USD", min_length=3, max_length=10)
+    destination_asset: str = Field(default="EUR", min_length=3, max_length=10)
+    amount_usd: Decimal = Field(default=Decimal("100.00"), gt=Decimal("0"), max_digits=20, decimal_places=8)
+
+    @field_validator("amount_usd", mode="before")
+    @classmethod
+    def convert_amount_usd_to_decimal(cls, value: object) -> object:
+        if isinstance(value, (float, int, str)):
+            return Decimal(str(value))
+        return value
+
+
+class ReportExportRequest(StrictSchema):
     profile_id: UUID
-    fai_score_data: Dict[str, Any]
-    interventions_executed: List[Dict[str, Any]] = Field(default_factory=list)
+    fai_score_data: dict[str, Any]
+    interventions_executed: list[dict[str, Any]] = Field(default_factory=list)
 
 
-@router.get("/health", tags=["Health"])
-async def health_check() -> Dict[str, str]:
-    """Health check endpoint."""
-    return {"status": "healthy", "service": "financial-access-intelligence"}
+# ---------------------------------------------------------------------------
+# Output Schemas (DTOs)
+# ---------------------------------------------------------------------------
 
 
-@router.post("/api/v1/scores/calculate", tags=["FAI Scoring"])
-async def calculate_fai_score(payload: FeatureIngestionSchema) -> Dict[str, Any]:
-    """Calculates FAI scores and diagnoses structural barriers for a profile."""
-    use_case = CalculateFAIScoreUseCase()
-    request_dto = CalculateFAIScoreRequestDTO(
+class HealthResponse(StrictSchema):
+    status: Literal["healthy"]
+    service: str
+
+
+class BarrierResponse(StrictSchema):
+    barrier_id: UUID
+    barrier_code: str
+    dimension: str
+    severity: str
+    evidence: dict[str, Any]
+
+
+class FaiScoreResponse(StrictSchema):
+    score_id: UUID
+    profile_id: UUID
+    overall_score: Decimal
+    dimension_scores: dict[str, Decimal]
+    barriers: list[BarrierResponse]
+    scoring_version: str
+    methodology: str
+    calculated_at: str
+
+
+class InterventionResponse(StrictSchema):
+    intervention_id: UUID
+    barrier_id: UUID
+    profile_id: UUID
+    intervention_type: str
+    status: str
+    metadata: dict[str, Any]
+
+
+class InterventionListResponse(StrictSchema):
+    interventions_count: int
+    interventions: list[InterventionResponse]
+
+
+class PaymentResponse(StrictSchema):
+    status: Literal["SUBMITTED", "COMPLETED", "FAILED", "SUCCESS"]
+    intervention_id: UUID
+    open_payments_outgoing_id: str
+    debit_amount: Decimal
+    asset_code: str
+    estimated_fee: Decimal
+
+
+class RouteOptimizationResponse(StrictSchema):
+    recommended_route_id: str
+    source_asset: str
+    destination_asset: str
+    predicted_fee_pct: Decimal
+    predicted_success_probability: Decimal
+    estimated_settlement_ms: Decimal
+    liquidity_provider: str
+    recommended_action: str
+
+
+class AuditReportResponse(StrictSchema):
+    profile_id: UUID
+    overall_score: Decimal
+    total_fees_saved_usd: Decimal
+    report_markdown: str
+
+
+# ---------------------------------------------------------------------------
+# HTTP Endpoints (Controller Layer < 10 lines per function)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/health", response_model=HealthResponse, tags=["Health"])
+async def health_check() -> HealthResponse:
+    return HealthResponse(status="healthy", service="financial-access-intelligence")
+
+
+@router.post("/api/v1/scores/calculate", response_model=FaiScoreResponse, tags=["FAI Scoring"])
+async def calculate_fai_score(
+    payload: FeatureIngestionRequest,
+    use_case: CalculateFAIScoreUseCase = Depends(get_calculate_fai_score_use_case),
+) -> FaiScoreResponse:
+    uc = _resolve_dep(use_case, get_calculate_fai_score_use_case)
+    dto_req = CalculateFAIScoreRequestDTO(
         profile_id=payload.profile_id,
         wallet_count=payload.wallet_count,
         ilp_reachable=payload.ilp_reachable,
@@ -97,131 +251,107 @@ async def calculate_fai_score(payload: FeatureIngestionSchema) -> Dict[str, Any]
         fallback_route_available=payload.fallback_route_available,
         methodology=payload.methodology,
     )
-    result = use_case.execute(request_dto)
-    return {
-        "score_id": str(result.score_id),
-        "profile_id": str(result.profile_id),
-        "overall_score": result.overall_score,
-        "dimension_scores": result.dimension_scores,
-        "barriers": [b.__dict__ for b in result.barriers],
-        "scoring_version": result.scoring_version,
-        "methodology": result.methodology,
-        "calculated_at": result.calculated_at,
-    }
-
-
-@router.post("/api/v1/interventions/recommend", tags=["Interventions"])
-async def recommend_interventions(barriers_payload: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Recommends interventions based on diagnosed barriers."""
-    engine = InterventionEngine()
-    domain_barriers = []
-
-    for b in barriers_payload:
-        domain_barriers.append(
-            Barrier(
-                barrier_id=UUID(b["barrier_id"]) if "barrier_id" in b else uuid4(),
-                snapshot_id=uuid4(),
-                profile_id=UUID(b["profile_id"]) if "profile_id" in b else uuid4(),
-                barrier_code=BarrierCode(b["barrier_code"]),
-                dimension=DimensionType(b["dimension"]),
-                severity=BarrierSeverity(b["severity"]),
-                evidence=b.get("evidence", {}),
+    result = uc.execute(dto_req)
+    return FaiScoreResponse(
+        score_id=result.score_id,
+        profile_id=result.profile_id,
+        overall_score=Decimal(str(round(result.overall_score, 2))),
+        dimension_scores={k: Decimal(str(round(v, 2))) for k, v in result.dimension_scores.items()},
+        barriers=[
+            BarrierResponse(
+                barrier_id=b.barrier_id,
+                barrier_code=b.barrier_code,
+                dimension=b.dimension,
+                severity=b.severity,
+                evidence=b.evidence,
             )
-        )
-
-    interventions = engine.recommend_interventions(domain_barriers)
-    return {
-        "interventions_count": len(interventions),
-        "interventions": [
-            {
-                "intervention_id": str(i.intervention_id),
-                "barrier_id": str(i.barrier_id),
-                "profile_id": str(i.profile_id),
-                "intervention_type": i.intervention_type.value,
-                "status": i.status.value,
-                "metadata": i.metadata,
-            }
-            for i in interventions
+            for b in result.barriers
         ],
-    }
-
-
-@router.post("/api/v1/payments/execute", tags=["Open Payments Execution"])
-async def execute_intervention_payment(payload: ExecuteInterventionRequestSchema) -> Dict[str, Any]:
-    """Executes a financial intervention via Open Payments ACL."""
-    from src.domain.shared.value_objects import Money, WalletAddress
-    from uuid import uuid4 as _uuid4
-
-    op_acl = MockOpenPaymentsACLAdapter()
-
-    sender_wallet = WalletAddress(url=payload.sender_wallet)
-    receiver_wallet = WalletAddress(url=payload.receiver_wallet)
-    amount = Money(amount=Decimal(str(payload.amount)), asset_code=payload.asset_code, asset_scale=2)
-
-    # 1. Resolve receiver Wallet Address metadata
-    wallet_metadata = await op_acl.resolve_wallet(receiver_wallet)
-
-    # 2. Simulate GNAP access token (in production: call authorization server)
-    access_token = f"gnap-token-{_uuid4()}"
-
-    # 3. Create Incoming Payment on receiver's resource server
-    inc_payment = await op_acl.create_incoming_payment(
-        wallet_address=receiver_wallet,
-        amount=amount,
-        access_token=access_token,
+        scoring_version=result.scoring_version,
+        methodology=result.methodology,
+        calculated_at=result.calculated_at,
     )
 
-    incoming_payment_id = inc_payment.get("id", f"{receiver_wallet.url}/incoming-payments/{_uuid4()}")
 
-    # 4. Request Quote from sender's resource server
-    quote = await op_acl.get_quote(
-        sender_wallet=sender_wallet,
-        receiver_incoming_payment_url=incoming_payment_id,
-        access_token=access_token,
+@router.post("/api/v1/interventions/recommend", response_model=InterventionListResponse, tags=["Interventions"])
+async def recommend_interventions(
+    payload: list[BarrierRequest],
+    use_case: RecommendInterventionsUseCase = Depends(get_recommend_interventions_use_case),
+) -> InterventionListResponse:
+    uc = _resolve_dep(use_case, get_recommend_interventions_use_case)
+    raw_payload = [b.model_dump() for b in payload]
+    res = uc.execute(raw_payload)
+    return InterventionListResponse(
+        interventions_count=res["interventions_count"],
+        interventions=[
+            InterventionResponse(
+                intervention_id=i["intervention_id"],
+                barrier_id=i["barrier_id"],
+                profile_id=i["profile_id"],
+                intervention_type=i["intervention_type"],
+                status=i["status"],
+                metadata=i["metadata"],
+            )
+            for i in res["interventions"]
+        ],
     )
 
-    quote_id = quote.get("id", f"{sender_wallet.url}/quotes/{_uuid4()}")
-    estimated_fee = quote.get("estimatedFee", {}).get("value", "0")
 
-    # 5. Create Outgoing Payment
-    outgoing = await op_acl.create_outgoing_payment(
-        sender_wallet=sender_wallet,
-        quote_url=quote_id,
-        access_token=access_token,
+@router.post("/api/v1/payments/execute", response_model=PaymentResponse, tags=["Open Payments"])
+async def execute_intervention_payment(
+    payload: ExecutePaymentRequest,
+    use_case: ExecuteInterventionPaymentUseCase = Depends(get_execute_intervention_payment_use_case),
+) -> PaymentResponse:
+    uc = _resolve_dep(use_case, get_execute_intervention_payment_use_case)
+    res = await uc.execute(
+        intervention_id=payload.intervention_id,
+        sender_wallet_str=payload.sender_wallet,
+        receiver_wallet_str=payload.receiver_wallet,
+        amount=payload.amount,
+        asset_code=payload.asset_code,
+        idempotency_key=payload.idempotency_key,
+    )
+    status_val = res["status"]
+    if status_val in ("COMPLETED", "SUBMITTED"):
+        status_val = "SUCCESS"
+    return PaymentResponse(
+        status=status_val,
+        intervention_id=res["intervention_id"],
+        open_payments_outgoing_id=res["open_payments_outgoing_id"],
+        debit_amount=res["debit_amount"],
+        asset_code=res["asset_code"],
+        estimated_fee=res["estimated_fee"],
     )
 
-    debit_amount = outgoing.get("debitAmount", {}).get("value", "0")
 
-    return {
-        "status": "SUCCESS",
-        "intervention_id": str(payload.intervention_id),
-        "open_payments_outgoing_id": outgoing.get("id", ""),
-        "debit_amount": float(int(debit_amount)) / 100,
-        "asset_code": payload.asset_code,
-        "estimated_fee": float(int(estimated_fee)) / 100,
-        "wallet_metadata": wallet_metadata,
-    }
-
-
-@router.post("/api/v1/routes/optimize", tags=["Predictive Routing"])
-async def optimize_route(payload: RouteOptimizationRequestSchema) -> Dict[str, Any]:
-    """Predicts optimal Open Payments ILP route using ML fee predictor."""
-    predictor = ILPLiquidityFeePredictor()
-    res = predictor.predict_optimal_route(
+@router.post("/api/v1/routes/optimize", response_model=RouteOptimizationResponse, tags=["Routing"])
+async def optimize_route(
+    payload: RouteOptimizationRequest,
+    use_case: OptimizeRouteUseCase = Depends(get_optimize_route_use_case),
+) -> RouteOptimizationResponse:
+    uc = _resolve_dep(use_case, get_optimize_route_use_case)
+    res = uc.execute(
         source_asset=payload.source_asset,
         destination_asset=payload.destination_asset,
         amount_usd=payload.amount_usd,
     )
-    return res.__dict__
+    return RouteOptimizationResponse(**res)
 
 
-@router.post("/api/v1/reports/export", tags=["Audit Exporter"])
-async def export_audit_report(payload: ReportExportRequestSchema) -> Dict[str, Any]:
-    """Generates a downloadable Financial Access Audit Report."""
-    exporter = FinancialAccessAuditReportExporter()
-    res = exporter.generate_report(
+@router.post("/api/v1/reports/export", response_model=AuditReportResponse, tags=["Audit"])
+async def export_audit_report(
+    payload: ReportExportRequest,
+    use_case: ExportAuditReportUseCase = Depends(get_export_audit_report_use_case),
+) -> AuditReportResponse:
+    uc = _resolve_dep(use_case, get_export_audit_report_use_case)
+    res = uc.execute(
         profile_id=payload.profile_id,
         fai_score_data=payload.fai_score_data,
         interventions_executed=payload.interventions_executed,
     )
-    return res
+    return AuditReportResponse(
+        profile_id=payload.profile_id,
+        overall_score=Decimal(str(round(res["overall_score"], 2))),
+        total_fees_saved_usd=Decimal(str(res["total_fees_saved_usd"])),
+        report_markdown=res["report_markdown"],
+    )

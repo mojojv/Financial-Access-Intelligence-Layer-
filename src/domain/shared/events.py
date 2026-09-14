@@ -1,8 +1,7 @@
 """Pure Domain Events for Event-Driven Communication."""
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Any, Dict
 from uuid import UUID, uuid4
 
 
@@ -10,7 +9,7 @@ from uuid import UUID, uuid4
 class DomainEvent:
     """Base immutable Domain Event class."""
     event_id: UUID = field(default_factory=uuid4)
-    occurred_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    occurred_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass(frozen=True, kw_only=True)

@@ -1,10 +1,11 @@
 """Unit tests for Financial Access Index scoring calculation."""
 from decimal import Decimal
 from uuid import uuid4
-from src.domain.access_index.dimensions import DimensionType, WeightVector
+
+from src.domain.access_index.dimensions import DimensionType
 from src.domain.access_index.scoring import (
-    FeatureVector,
     DeterministicRuleScoringEngine,
+    FeatureVector,
 )
 
 

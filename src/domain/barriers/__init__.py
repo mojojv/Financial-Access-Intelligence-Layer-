@@ -1,14 +1,14 @@
 """Barrier Domain Package."""
 from src.domain.barriers.barriers import (
-    BarrierSeverity,
-    BarrierCode,
     Barrier,
+    BarrierCode,
     BarrierDetectionService,
+    BarrierSeverity,
 )
 
 __all__ = [
-    "BarrierSeverity",
-    "BarrierCode",
     "Barrier",
+    "BarrierCode",
     "BarrierDetectionService",
+    "BarrierSeverity",
 ]

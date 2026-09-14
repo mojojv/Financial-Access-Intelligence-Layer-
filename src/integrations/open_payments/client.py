@@ -1,7 +1,7 @@
 """Asynchronous Open Payments ACL Client Adapter with Ed25519 GNAP HTTP Signatures."""
-from decimal import Decimal
-from typing import Any, Dict, Optional
+from typing import Any
 from uuid import uuid4
+
 import httpx
 
 from src.application.common.ports import OpenPaymentsAdapterInterface
@@ -14,14 +14,14 @@ class OpenPaymentsACLClient(OpenPaymentsAdapterInterface):
     def __init__(
         self,
         client_key_id: str = "key-001",
-        private_key_pem: Optional[str] = None,
-        http_client: Optional[httpx.AsyncClient] = None,
+        private_key_pem: str | None = None,
+        http_client: httpx.AsyncClient | None = None,
     ) -> None:
         self.client_key_id = client_key_id
         self.private_key_pem = private_key_pem
         self._client = http_client or httpx.AsyncClient(timeout=10.0)
 
-    def _generate_gnap_signature_headers(self, method: str, url: str) -> Dict[str, str]:
+    def _generate_gnap_signature_headers(self, method: str, url: str) -> dict[str, str]:
         """Generates structured Open Payments Ed25519 HTTP Signature headers for GNAP protocol."""
         return {
             "Signature-Input": f'sig1=("@method" "@target-uri");created=1617000000;keyid="{self.client_key_id}"',
@@ -30,7 +30,7 @@ class OpenPaymentsACLClient(OpenPaymentsAdapterInterface):
             "Accept": "application/json",
         }
 
-    async def resolve_wallet(self, wallet_url: WalletAddress) -> Dict[str, Any]:
+    async def resolve_wallet(self, wallet_url: WalletAddress) -> dict[str, Any]:
         """Resolves Wallet Address URL to metadata (authServer, assetCode, assetScale)."""
         headers = {"Accept": "application/json"}
         try:
@@ -54,7 +54,7 @@ class OpenPaymentsACLClient(OpenPaymentsAdapterInterface):
         wallet_address: WalletAddress,
         amount: Money,
         access_token: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Creates Incoming Payment on receiver's Resource Server."""
         url = f"{wallet_address.url}/incoming-payments"
         headers = self._generate_gnap_signature_headers("POST", url)
@@ -90,7 +90,7 @@ class OpenPaymentsACLClient(OpenPaymentsAdapterInterface):
         sender_wallet: WalletAddress,
         receiver_incoming_payment_url: str,
         access_token: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Requests payment Quote on sender's Resource Server."""
         url = f"{sender_wallet.url}/quotes"
         headers = self._generate_gnap_signature_headers("POST", url)
@@ -122,7 +122,7 @@ class OpenPaymentsACLClient(OpenPaymentsAdapterInterface):
         sender_wallet: WalletAddress,
         quote_url: str,
         access_token: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Executes Outgoing Payment using authorized quote."""
         url = f"{sender_wallet.url}/outgoing-payments"
         headers = self._generate_gnap_signature_headers("POST", url)

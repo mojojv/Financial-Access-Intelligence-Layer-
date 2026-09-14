@@ -1,12 +1,12 @@
 """Barrier Entity and Severity Classifications."""
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any
 from uuid import UUID, uuid4
 
-from src.domain.shared.value_objects import BarrierCode, DimensionKey
 from src.domain.access_index.dimensions import DimensionType
+from src.domain.shared.value_objects import BarrierCode as BarrierCode, DimensionKey
 
 
 class BarrierSeverity(str, Enum):
@@ -34,9 +34,9 @@ class Barrier:
     barrier_code: BarrierCode
     dimension: DimensionKey
     severity: BarrierSeverity
-    evidence: Dict[str, Any]
+    evidence: dict[str, Any]
     state: BarrierState = BarrierState.DIAGNOSED
-    detected_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    detected_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def resolve(self) -> None:
         """Transitions barrier state to RESOLVED."""
@@ -50,8 +50,8 @@ class Barrier:
 class BarrierDetectionService:
     """Domain Service that evaluates an FAI Score snapshot against rule specifications to detect barriers."""
 
-    def detect_barriers(self, fai_score: Any) -> List[Barrier]:
-        barriers: List[Barrier] = []
+    def detect_barriers(self, fai_score: Any) -> list[Barrier]:
+        barriers: list[Barrier] = []
 
         # 1. Evaluate Affordability
         aff_score = fai_score.dimension_scores[DimensionType.AFFORDABILITY].score

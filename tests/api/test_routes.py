@@ -1,12 +1,13 @@
 """API handler logic tests running against pure Python ASGI app handlers."""
 import asyncio
 from uuid import UUID
+
 from apps.api.routes import (
-    health_check,
-    calculate_fai_score,
-    FeatureIngestionSchema,
-    execute_intervention_payment,
     ExecuteInterventionRequestSchema,
+    FeatureIngestionSchema,
+    calculate_fai_score,
+    execute_intervention_payment,
+    health_check,
 )
 
 

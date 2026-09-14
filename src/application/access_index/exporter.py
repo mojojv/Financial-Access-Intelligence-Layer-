@@ -1,7 +1,6 @@
 """Financial Access Audit Report Generator."""
-from datetime import datetime, timezone
-from decimal import Decimal
-from typing import Any, Dict, List
+from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
 
 
@@ -11,9 +10,9 @@ class FinancialAccessAuditReportExporter:
     def generate_report(
         self,
         profile_id: UUID,
-        fai_score_data: Dict[str, Any],
-        interventions_executed: List[Dict[str, Any]],
-    ) -> Dict[str, Any]:
+        fai_score_data: dict[str, Any],
+        interventions_executed: list[dict[str, Any]],
+    ) -> dict[str, Any]:
         overall_score = fai_score_data.get("overall_score", 0.0)
 
         # Classify inclusion level
@@ -30,7 +29,7 @@ class FinancialAccessAuditReportExporter:
         # Calculate cumulative savings
         total_fees_saved = sum(i.get("metadata", {}).get("estimated_savings_usd", 0.50) for i in interventions_executed)
 
-        timestamp = datetime.now(timezone.utc).isoformat()
+        timestamp = datetime.now(UTC).isoformat()
 
         report_markdown = f"""# Financial Access Audit Report
 **Profile ID**: `{profile_id}`  

@@ -1,6 +1,6 @@
 """Async SQLAlchemy session factory and engine configuration."""
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 try:
     from sqlalchemy.ext.asyncio import (

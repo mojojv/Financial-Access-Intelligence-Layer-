@@ -1,9 +1,8 @@
 """Financial Access Index Scoring Architecture and Strategy Interfaces."""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Dict, List, Optional
 from uuid import UUID, uuid4
 
 from src.domain.access_index.dimensions import (
@@ -36,11 +35,11 @@ class FAIScore:
     score_id: UUID
     profile_id: UUID
     overall_score: Decimal
-    dimension_scores: Dict[DimensionType, DimensionScore]
+    dimension_scores: dict[DimensionType, DimensionScore]
     weights: WeightVector
     scoring_version: str
     methodology: str
-    calculated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    calculated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def __post_init__(self) -> None:
         if not (Decimal("0") <= self.overall_score <= Decimal("100")):
@@ -55,7 +54,7 @@ class IFAIScoringEngine(ABC):
         self,
         profile_id: UUID,
         features: FeatureVector,
-        weight_vector: Optional[WeightVector] = None,
+        weight_vector: WeightVector | None = None,
     ) -> FAIScore:
         """Calculates FAI overall and dimension scores from raw features."""
         pass
@@ -68,11 +67,11 @@ class DeterministicRuleScoringEngine(IFAIScoringEngine):
         self,
         profile_id: UUID,
         features: FeatureVector,
-        weight_vector: Optional[WeightVector] = None,
+        weight_vector: WeightVector | None = None,
     ) -> FAIScore:
         weights = weight_vector or WeightVector.default_equal_weights()
 
-        dim_scores: Dict[DimensionType, DimensionScore] = {}
+        dim_scores: dict[DimensionType, DimensionScore] = {}
 
         # 1. Access: Wallets and ILP Reachability
         access_val = Decimal("0")

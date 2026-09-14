@@ -1,12 +1,11 @@
 """Financial Access Index Score Entities and Aggregations."""
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Dict
 from uuid import UUID, uuid4
 
-from src.domain.shared.value_objects import DimensionKey, ScoreValue, DimensionType
 from src.domain.shared.exceptions import InvalidValueObjectError
+from src.domain.shared.value_objects import DimensionKey, DimensionType as DimensionType, ScoreValue
 
 
 @dataclass(frozen=True)
@@ -26,7 +25,7 @@ class DimensionScore:
 @dataclass(frozen=True)
 class WeightVector:
     """Normalized weight vector for FAI calculation."""
-    weights: Dict[DimensionType, Decimal]
+    weights: dict[DimensionType, Decimal]
 
     def __post_init__(self) -> None:
         missing = set(DimensionType) - set(self.weights.keys())
@@ -41,7 +40,7 @@ class WeightVector:
     def default_equal_weights(cls) -> "WeightVector":
         """Returns equal weights (1/7 for each dimension)."""
         equal_w = Decimal("1.0") / Decimal(len(DimensionType))
-        weights = {dim: equal_w for dim in DimensionType}
+        weights = dict.fromkeys(DimensionType, equal_w)
         residual = Decimal("1.0") - sum(weights.values())
         weights[DimensionType.ACCESS] += residual
         return cls(weights=weights)
@@ -62,17 +61,17 @@ class FinancialScore:
     score_id: UUID
     profile_id: UUID
     overall_score: ScoreValue
-    dimensions: Dict[DimensionKey, FinancialDimension]
+    dimensions: dict[DimensionKey, FinancialDimension]
     scoring_version: str
     methodology: str
-    calculated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    calculated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @classmethod
     def create(
         cls,
         profile_id: UUID,
         overall_score: ScoreValue,
-        dimensions: Dict[DimensionKey, FinancialDimension],
+        dimensions: dict[DimensionKey, FinancialDimension],
         scoring_version: str,
         methodology: str,
     ) -> "FinancialScore":

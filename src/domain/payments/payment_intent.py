@@ -1,8 +1,7 @@
 """PaymentIntent Entity representing payment execution intent."""
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Optional
 from uuid import UUID, uuid4
 
 from src.domain.shared.value_objects import Money, WalletAddress
@@ -26,10 +25,10 @@ class PaymentIntent:
     receiver_wallet: WalletAddress
     amount: Money
     status: PaymentIntentStatus = PaymentIntentStatus.DRAFT
-    incoming_payment_url: Optional[str] = None
-    quote_url: Optional[str] = None
-    outgoing_payment_url: Optional[str] = None
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    incoming_payment_url: str | None = None
+    quote_url: str | None = None
+    outgoing_payment_url: str | None = None
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @classmethod
     def create(

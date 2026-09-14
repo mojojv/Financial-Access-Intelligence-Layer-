@@ -1,10 +1,10 @@
 """Abstract Weighting Strategies for Financial Access Index Calculation."""
 from abc import ABC, abstractmethod
 from decimal import Decimal
-from typing import Dict
+
 from src.domain.access_index.dimensions import FinancialDimension, WeightVector
-from src.domain.shared.value_objects import DimensionKey, ScoreValue
 from src.domain.shared.exceptions import InvalidValueObjectError
+from src.domain.shared.value_objects import DimensionKey, ScoreValue
 
 
 class WeightingStrategy(ABC):
@@ -13,7 +13,7 @@ class WeightingStrategy(ABC):
     @abstractmethod
     def compute_composite_score(
         self,
-        dimensions: Dict[DimensionKey, FinancialDimension],
+        dimensions: dict[DimensionKey, FinancialDimension],
         weight_vector: WeightVector,
     ) -> ScoreValue:
         """Computes the overall composite FAI ScoreValue (0.00 to 100.00)."""
@@ -25,7 +25,7 @@ class DeterministicLinearWeightingStrategy(WeightingStrategy):
 
     def compute_composite_score(
         self,
-        dimensions: Dict[DimensionKey, FinancialDimension],
+        dimensions: dict[DimensionKey, FinancialDimension],
         weight_vector: WeightVector,
     ) -> ScoreValue:
         if not dimensions:
@@ -46,7 +46,7 @@ class PCAStatisticalWeightingStrategy(WeightingStrategy):
 
     def compute_composite_score(
         self,
-        dimensions: Dict[DimensionKey, FinancialDimension],
+        dimensions: dict[DimensionKey, FinancialDimension],
         weight_vector: WeightVector,
     ) -> ScoreValue:
         # Variance-weighted PCA formulation simulation

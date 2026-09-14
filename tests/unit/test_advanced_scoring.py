@@ -1,7 +1,7 @@
 """Unit tests for advanced scoring engines (MCDA & ML XGBoost)."""
 from decimal import Decimal
 from uuid import uuid4
-from src.domain.access_index.dimensions import DimensionType
+
 from src.domain.access_index.scoring import FeatureVector
 from src.infrastructure.ml.scoring.mcda import MCDAScoringEngine
 from src.infrastructure.ml.scoring.xgboost_engine import XGBoostMLScoringEngine

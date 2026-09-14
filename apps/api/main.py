@@ -1,17 +1,15 @@
 """FastAPI Application Lifecycle, Dependency Injection, and Server Configuration."""
 import os
 from contextlib import asynccontextmanager
-from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
 
 from apps.api.routes import router
-from src.infrastructure.observability.logging import configure_logging, get_logger
 from src.infrastructure.events.event_bus import get_event_bus
-
+from src.infrastructure.observability.logging import configure_logging, get_logger
 
 logger = get_logger("fail.api")
 
@@ -94,7 +92,7 @@ def create_app() -> FastAPI:
     async def prometheus_metrics() -> str:
         """Exposes Prometheus-compatible metrics for scraping."""
         try:
-            from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+            from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
             return PlainTextResponse(
                 content=generate_latest().decode("utf-8"),
                 media_type=CONTENT_TYPE_LATEST,
